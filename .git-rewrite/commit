@@ -1,0 +1,6 @@
+tree 0e39053c345ffee4a741ca505f5c2819238f44ec
+parent 7d486ef5e8fcb8066a9bdaaabeb9332082097790
+author ianfer19 <ifernandezalvarez@correo.unicordoba.edu.co> 1777901513 -0500
+committer ianfer19 <ifernandezalvarez@correo.unicordoba.edu.co> 1777901513 -0500
+
+feat: implement POS navigation sub-header and add Mesas, Reservas, and Mostrador screens
