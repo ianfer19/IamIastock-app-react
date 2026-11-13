@@ -184,17 +184,6 @@ export const CourtsPricingScreen = () => {
         ];
     }, [tab, activeRates, activePromotions, todayRateCount, maxRate]);
 
-    const heroImage = useMemo(() => {
-        if (tab === 'PROMOTIONS') {
-            return activePromotions.flatMap(promo => promo.images || []).find(Boolean)
-                || promotions.flatMap(promo => promo.images || []).find(Boolean)
-                || null;
-        }
-        return courts.find(court => court.court_id === selectedCourtId && court.images?.length)?.images?.find(Boolean)
-            || courts.flatMap(court => court.images || []).find(Boolean)
-            || null;
-    }, [tab, activePromotions, promotions, courts, selectedCourtId]);
-
     const heroValue = tab === 'RATES' ? formatMoneyNoDecimals(averageRate) : activePromotions.length;
     const heroSuffix = tab === 'RATES' ? '/h' : `/${promotions.length}`;
     const heroProgress = tab === 'RATES'
@@ -279,7 +268,6 @@ export const CourtsPricingScreen = () => {
                     suffix={heroSuffix}
                     progress={heroProgress}
                     hint={heroHint}
-                    image={heroImage}
                     stats={heroStats}
                     compact
                 />

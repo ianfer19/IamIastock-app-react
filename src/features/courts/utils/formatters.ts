@@ -27,6 +27,28 @@ export const formatMoneyNoDecimals = (value: unknown): string => {
     }
 };
 
+const shortNumber = (value: number): string => {
+    const digits = value >= 100 ? 0 : 1;
+    return value.toFixed(digits).replace('.', ',');
+};
+
+/**
+ * Monto abreviado para espacios reducidos (hero, chips).
+ * Ej: 2680000 → "$2,7M" · 25000 → "$25.000"
+ */
+export const formatMoneyCompact = (value: unknown): string => {
+    const amount = roundAmount(value);
+    const full = formatMoneyNoDecimals(amount);
+    if (amount < 100000) return full;
+    const unit = amount >= 1000000000
+        ? { size: 1000000000, suffix: 'MM' }
+        : amount >= 1000000
+            ? { size: 1000000, suffix: 'M' }
+            : { size: 1000, suffix: 'k' };
+    const symbol = full.replace(/[\d.,\s]/g, '');
+    return `${symbol}${shortNumber(amount / unit.size)}${unit.suffix}`;
+};
+
 export const isoDate = (date: Date = new Date()): string => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');

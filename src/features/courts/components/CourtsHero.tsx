@@ -3,14 +3,13 @@ import { ImageBackground, StyleSheet, Text, useWindowDimensions, View } from 're
 import { LinearGradient } from 'expo-linear-gradient';
 import { MotiView } from 'moti';
 import { LucideIcon } from 'lucide-react-native';
-import Svg, { Polygon } from 'react-native-svg';
+import Svg, { Circle, Line, Path, Polygon, Rect } from 'react-native-svg';
 import { rem } from '@/core/utils/responsive';
 import {
     courtsColors,
     courtsFonts,
     courtsRadii,
     courtsShadow,
-    courtsSpacing,
     courtsTypography,
 } from '../theme/courtsTheme';
 
@@ -34,6 +33,62 @@ interface CourtsHeroProps {
     compact?: boolean;
 }
 
+/**
+ * Marcas de cancha (líneas) dibujadas sobre el fondo verde del hero.
+ */
+const PitchMarks = () => (
+    <Svg style={StyleSheet.absoluteFill} viewBox="0 0 100 60" preserveAspectRatio="none" pointerEvents="none">
+        <Rect x="3" y="3" width="94" height="54" fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth="0.7" />
+        <Line x1="50" y1="3" x2="50" y2="57" stroke="rgba(255,255,255,0.18)" strokeWidth="0.7" />
+        <Circle cx="50" cy="30" r="9.5" fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="0.7" />
+        <Circle cx="50" cy="30" r="1" fill="rgba(255,255,255,0.3)" />
+        <Rect x="28" y="3" width="44" height="11" fill="none" stroke="rgba(255,255,255,0.16)" strokeWidth="0.6" />
+        <Rect x="28" y="46" width="44" height="11" fill="none" stroke="rgba(255,255,255,0.16)" strokeWidth="0.6" />
+    </Svg>
+);
+
+const BALL_SPOKES: [number, number, number, number][] = [
+    [32, 19, 32, 4],
+    [42.4, 26.6, 57.4, 21.8],
+    [38.4, 38.9, 49.6, 49.4],
+    [25.6, 38.9, 14.4, 49.4],
+    [21.6, 26.6, 6.6, 21.8],
+];
+
+/**
+ * Balón de fútbol decorativo del hero.
+ */
+const FootballBall = ({ size }: { size: number }) => (
+    <Svg width={size} height={size} viewBox="0 0 64 64" pointerEvents="none">
+        <Circle
+            cx="32"
+            cy="32"
+            r="29"
+            fill="rgba(255,255,255,0.10)"
+            stroke="rgba(255,255,255,0.42)"
+            strokeWidth="1.4"
+        />
+        <Path
+            d="M32 18.5 L42.6 26.3 L38.6 38.8 H25.4 L21.4 26.3 Z"
+            fill="rgba(255,255,255,0.38)"
+            stroke="rgba(255,255,255,0.6)"
+            strokeWidth="1.1"
+            strokeLinejoin="round"
+        />
+        {BALL_SPOKES.map(([x1, y1, x2, y2], index) => (
+            <Line
+                key={index}
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke="rgba(255,255,255,0.42)"
+                strokeWidth="1.1"
+            />
+        ))}
+    </Svg>
+);
+
 export const CourtsHero = ({
     eyebrow,
     value,
@@ -47,6 +102,7 @@ export const CourtsHero = ({
     const { width } = useWindowDimensions();
     const stacked = width < 720;
     const progressValue = Math.min(100, Math.max(0, Number(progress ?? 0) || 0));
+    const ballSize = rem(compact ? 44 : 56);
 
     return (
         <MotiView
@@ -83,6 +139,11 @@ export const CourtsHero = ({
                     </View>
                 )}
 
+                <PitchMarks />
+                <View style={[styles.ball, { width: ballSize, height: ballSize }]}>
+                    <FootballBall size={ballSize} />
+                </View>
+
                 {!stacked ? (
                     <Svg style={StyleSheet.absoluteFill} viewBox="0 0 100 100" preserveAspectRatio="none">
                         <Polygon points="100,0 100,100 84,100" fill={courtsColors.background} />
@@ -95,14 +156,14 @@ export const CourtsHero = ({
                         <Text style={[styles.bigValue, compact && styles.bigValueCompact]} numberOfLines={1} adjustsFontSizeToFit>
                             {value}
                         </Text>
-                        {suffix ? <Text style={styles.suffix}>{suffix}</Text> : null}
+                        {suffix ? <Text style={[styles.suffix, compact && styles.suffixCompact]}>{suffix}</Text> : null}
                     </View>
                     {progress !== null ? (
-                        <View style={styles.progressTrack}>
+                        <View style={[styles.progressTrack, compact && styles.progressTrackCompact]}>
                             <View style={[styles.progressFill, { width: `${progressValue}%` }]} />
                         </View>
                     ) : null}
-                    {hint ? <Text style={styles.hint}>{hint}</Text> : null}
+                    {hint ? <Text style={styles.hint} numberOfLines={compact ? 2 : 3}>{hint}</Text> : null}
                 </View>
             </View>
 
@@ -124,8 +185,8 @@ export const CourtsHero = ({
                     const Icon = stat.icon;
                     return (
                         <View key={stat.label} style={styles.stat}>
-                            <View style={[styles.statIcon, toneStyle]}>
-                                <Icon size={rem(compact ? 16 : 20)} color={iconColor} strokeWidth={2.1} />
+                            <View style={[styles.statIcon, compact && styles.statIconCompact, toneStyle]}>
+                                <Icon size={rem(compact ? 14 : 18)} color={iconColor} strokeWidth={2.1} />
                             </View>
                             <View style={styles.statCopy}>
                                 <Text style={styles.statLabel} numberOfLines={1}>{stat.label}</Text>
@@ -144,7 +205,7 @@ export const CourtsHero = ({
 const styles = StyleSheet.create({
     hero: {
         flexDirection: 'row',
-        minHeight: rem(176),
+        minHeight: rem(112),
         borderRadius: rem(courtsRadii.hero),
         backgroundColor: courtsColors.surface,
         overflow: 'hidden',
@@ -167,8 +228,8 @@ const styles = StyleSheet.create({
         minWidth: 0,
     },
     pitchCompact: {
-        paddingHorizontal: rem(24),
-        paddingVertical: rem(21),
+        paddingHorizontal: rem(18),
+        paddingVertical: rem(9),
     },
     stripeRow: {
         ...StyleSheet.absoluteFillObject,
@@ -177,20 +238,26 @@ const styles = StyleSheet.create({
     stripe: {
         flex: 1,
     },
+    ball: {
+        position: 'absolute',
+        right: rem(8),
+        bottom: rem(4),
+        opacity: 0.9,
+    },
     pitchContent: {
         zIndex: 2,
     },
     eyebrow: {
         fontFamily: courtsFonts.extraBold,
-        fontSize: rem(10),
-        letterSpacing: 1.4,
+        fontSize: rem(8.5),
+        letterSpacing: 1.2,
         color: '#D9F99D',
     },
     valueRow: {
         flexDirection: 'row',
         alignItems: 'flex-end',
-        gap: rem(5),
-        marginTop: rem(6),
+        gap: rem(4),
+        marginTop: rem(3),
     },
     bigValue: {
         fontFamily: courtsFonts.extraBold,
@@ -200,14 +267,18 @@ const styles = StyleSheet.create({
         color: courtsColors.white,
     },
     bigValueCompact: {
-        fontSize: rem(courtsTypography.heroValueSmall),
-        lineHeight: rem(courtsTypography.heroValueSmall + 4),
+        fontSize: rem(22),
+        lineHeight: rem(25),
     },
     suffix: {
         marginBottom: rem(7),
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(18),
         color: courtsColors.lime,
+    },
+    suffixCompact: {
+        marginBottom: rem(3),
+        fontSize: rem(12),
     },
     progressTrack: {
         marginTop: rem(8),
@@ -218,16 +289,23 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.25)',
         overflow: 'hidden',
     },
+    progressTrackCompact: {
+        marginTop: rem(4),
+        width: rem(104),
+        height: rem(4),
+        borderRadius: rem(2),
+    },
     progressFill: {
         height: '100%',
-        borderRadius: rem(3),
+        borderRadius: rem(2),
         backgroundColor: courtsColors.lime,
     },
     hint: {
-        marginTop: rem(7),
+        marginTop: rem(3),
+        paddingRight: rem(34),
         fontFamily: courtsFonts.semibold,
-        fontSize: rem(courtsTypography.nano + 1),
-        lineHeight: rem(14),
+        fontSize: rem(8.5),
+        lineHeight: rem(11),
         color: 'rgba(255,255,255,0.78)',
     },
     stats: {
@@ -242,13 +320,15 @@ const styles = StyleSheet.create({
     },
     statsStacked: {
         justifyContent: 'space-between',
-        paddingHorizontal: rem(16),
+        paddingHorizontal: rem(12),
+        paddingVertical: rem(8),
+        gap: rem(6),
     },
     stat: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: rem(9),
-        minWidth: rem(104),
+        gap: rem(6),
+        minWidth: rem(76),
     },
     statIcon: {
         width: rem(43),
@@ -256,6 +336,11 @@ const styles = StyleSheet.create({
         borderRadius: rem(14),
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    statIconCompact: {
+        width: rem(28),
+        height: rem(28),
+        borderRadius: rem(9),
     },
     iconIndigo: { backgroundColor: '#E4E6FF' },
     iconGreen: { backgroundColor: '#DCFCE7' },
@@ -266,8 +351,8 @@ const styles = StyleSheet.create({
     },
     statLabel: {
         fontFamily: courtsFonts.extraBold,
-        fontSize: rem(courtsTypography.nano),
-        letterSpacing: 0.5,
+        fontSize: rem(8),
+        letterSpacing: 0.4,
         color: '#4B4B63',
     },
     statValue: {
@@ -277,6 +362,7 @@ const styles = StyleSheet.create({
         color: courtsColors.text,
     },
     statValueCompact: {
-        fontSize: rem(18),
+        marginTop: 0,
+        fontSize: rem(15),
     },
 });

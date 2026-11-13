@@ -166,12 +166,6 @@ export const CourtsConfigScreen = () => {
         { label: 'INACTIVAS', value: courts.filter(court => court.status === 'INACTIVE').length, icon: CircleOff, tone: 'soft' },
     ], [courts]);
 
-    const heroImage = useMemo(() => {
-        const withImage = courts.find(court => court.status === 'ACTIVE' && court.images?.length)
-            || courts.find(court => court.images?.length);
-        return withImage?.images?.find(Boolean) || null;
-    }, [courts]);
-
     const openCourtModal = (court: Court | null) => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         setEditingCourt(court);
@@ -302,7 +296,6 @@ export const CourtsConfigScreen = () => {
                     suffix={`/ ${courts.length}`}
                     progress={courts.length ? Math.round((courts.filter(court => court.status === 'ACTIVE').length / courts.length) * 100) : 0}
                     hint="Las canchas activas aparecen en la agenda y en los links públicos."
-                    image={heroImage}
                     stats={heroStats}
                     compact
                 />

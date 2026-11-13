@@ -283,8 +283,9 @@ Las pantallas nuevas deben usar `rem()` para tamaños, spacing y radios, como el
 ### Canchas
 
 - `CourtsModuleScreen` → shell con tabs.
-- `CourtsHero` → hero del módulo.
-- `CourtsTabs` → tabs horizontales.
+- `CourtsHero` → hero del módulo (marcas de cancha + balón dibujados en SVG, alto reducido).
+- `CourtsNavBar` → barra de navegación estilo Ventas (`PosSubHeader`): iconos + etiqueta activa.
+- `CourtsAgendaFilters` → filtros de Agenda: vista día/semana/mes, canchas y “solo libres”, con navegación de período.
 - `CourtsUI` → `SectionCard`, `SectionHeader`, `FilterTabs`, `StatusPill`, `TagPill`, `EmptyState`, `PrimaryButton`, `IconButton`, `TextField`, `SwitchRow`, `DayChips`, `OptionChips`.
 - `CourtsModalShell` → modal base.
 - `CourtsConfirmModal` → confirmaciones destructivas.
@@ -342,7 +343,7 @@ listRates / createRate / updateRate / deleteRate
 listPromotions / createPromotion / updatePromotion / deletePromotion
 addPromotionException / removePromotionException
 quote / getGrid / getAvailability
-listBookings / createBooking / getBooking / updateBooking
+listBookings / listBookingsRange / createBooking / getBooking / updateBooking
 cancelBooking / checkIn / noShow / closeBooking
 listPaymentMethods / createPayment
 getSettings / updateSettings
@@ -387,6 +388,10 @@ BookingCreatePayload, CourtAsset, DayStats...
 ### Funcionalidad implementada
 
 - Agenda diaria con selector de 7 días.
+- Vista semanal: lista de 7 días con reservas, esperado, cobrado y barra de recaudo; tocar un día abre su agenda.
+- Vista mensual: calendario de 42 celdas con conteo de reservas y marca de saldo pendiente.
+- Filtros de Agenda: vista día/semana/mes, selector de canchas (incluye “Todas”) y “solo libres”.
+- Navegación de período: anterior, “Hoy” y siguiente (día/semana/mes).
 - Selector horizontal de canchas.
 - Timeline por slots de 60 minutos.
 - Colores por estado de pago/reserva.
@@ -432,7 +437,6 @@ BookingCreatePayload, CourtAsset, DayStats...
 
 ### Pendiente en Canchas
 
-- Vista semanal y mensual de Agenda.
 - Registro de pagos desde móvil.
 - Refunds.
 - Checkout/return de implementos por reserva.

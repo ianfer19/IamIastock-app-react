@@ -214,6 +214,13 @@ export const CourtsService = {
         return asArray<CourtBooking>(unwrap<unknown>(response));
     },
 
+    async listBookingsRange(from: string, to: string): Promise<CourtBooking[]> {
+        const response = await apiClient.get(`${Env.COURTS_URL}/courts/bookings`, {
+            params: { from, to },
+        });
+        return asArray<CourtBooking>(unwrap<unknown>(response));
+    },
+
     async getBooking(bookingId: string): Promise<CourtBooking> {
         const response = await apiClient.get(`${Env.COURTS_URL}/courts/bookings/${bookingId}`);
         return unwrap<CourtBooking>(response);

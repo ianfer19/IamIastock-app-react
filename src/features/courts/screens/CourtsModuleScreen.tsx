@@ -4,7 +4,7 @@ import { ArrowLeft, Boxes, CalendarDays, Goal, Percent } from 'lucide-react-nati
 import * as Haptics from 'expo-haptics';
 import { rem } from '@/core/utils/responsive';
 import { DashboardHeader } from '@/features/pos/components/DashboardLayout';
-import { CourtsTabs, CourtsTabItem } from '../components/CourtsTabs';
+import { CourtsNavBar, CourtsNavItem } from '../components/CourtsNavBar';
 import { courtsColors, courtsFonts, courtsRadii, courtsTypography } from '../theme/courtsTheme';
 import { CourtsAgendaScreen } from './CourtsAgendaScreen';
 import { CourtsConfigScreen } from './CourtsConfigScreen';
@@ -13,11 +13,11 @@ import { CourtsAssetsScreen } from './CourtsAssetsScreen';
 
 type CourtsTab = 'AGENDA' | 'CONFIG' | 'PRICING' | 'ASSETS';
 
-const TABS: CourtsTabItem[] = [
-    { key: 'AGENDA', label: 'Agenda', icon: CalendarDays },
-    { key: 'CONFIG', label: 'Canchas', icon: Goal },
-    { key: 'PRICING', label: 'Tarifas y promos', icon: Percent },
-    { key: 'ASSETS', label: 'Implementos', icon: Boxes },
+const TABS: CourtsNavItem[] = [
+    { key: 'AGENDA', label: 'Agenda', shortLabel: 'AGENDA', icon: CalendarDays },
+    { key: 'CONFIG', label: 'Canchas', shortLabel: 'CANCHAS', icon: Goal },
+    { key: 'PRICING', label: 'Tarifas y promos', shortLabel: 'TARIFAS', icon: Percent },
+    { key: 'ASSETS', label: 'Implementos', shortLabel: 'IMPLEMENTOS', icon: Boxes },
 ];
 
 export const CourtsModuleScreen = ({ onBack }: { onBack: () => void }) => {
@@ -45,13 +45,10 @@ export const CourtsModuleScreen = ({ onBack }: { onBack: () => void }) => {
                 </View>
             </View>
 
-            <CourtsTabs
-                tabs={TABS}
+            <CourtsNavBar
+                items={TABS}
                 active={tab}
-                onChange={key => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setTab(key as CourtsTab);
-                }}
+                onChange={key => setTab(key as CourtsTab)}
             />
 
             <View style={styles.content}>
