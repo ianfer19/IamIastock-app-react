@@ -12,10 +12,12 @@ import { Boxes, CircleCheck, CircleDollarSign, TriangleAlert } from 'lucide-reac
 import { rem } from '@/core/utils/responsive';
 import { CourtsService } from '../services/courtsService';
 import { CourtAsset } from '../types/courts.types';
-import { courtsColors, courtsFonts, courtsRadii, courtsShadow, courtsSpacing, courtsTypography } from '../theme/courtsTheme';
+import { CourtsPalette, courtsFonts, courtsRadii, courtsShadow, courtsSpacing, courtsTypography, useCourtsColors } from '../theme/courtsTheme';
 import { EmptyState, SectionCard } from '../components/CourtsUI';
 
 export const CourtsAssetsScreen = () => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const { width } = useWindowDimensions();
     const twoColumns = width >= 760;
     const [assets, setAssets] = useState<CourtAsset[]>([]);
@@ -53,7 +55,7 @@ export const CourtsAssetsScreen = () => {
     if (loading) {
         return (
             <View style={styles.center}>
-                <ActivityIndicator color={courtsColors.indigo} />
+                <ActivityIndicator color={colors.indigo} />
             </View>
         );
     }
@@ -67,7 +69,7 @@ export const CourtsAssetsScreen = () => {
                 <RefreshControl
                     refreshing={refreshing}
                     onRefresh={() => void load(true)}
-                    tintColor={courtsColors.indigo}
+                    tintColor={colors.indigo}
                 />
             )}
         >
@@ -78,7 +80,7 @@ export const CourtsAssetsScreen = () => {
                         <Text style={styles.summaryTitle}>{totals.total} unidades</Text>
                     </View>
                     <View style={styles.summaryIcon}>
-                        <Boxes size={rem(22)} color={courtsColors.indigo} strokeWidth={2} />
+                        <Boxes size={rem(22)} color={colors.indigo} strokeWidth={2} />
                     </View>
                 </View>
                 <View style={styles.summaryRow}>
@@ -110,6 +112,8 @@ export const CourtsAssetsScreen = () => {
 };
 
 const AssetCard = ({ asset }: { asset: CourtAsset }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const stock = asset.resumen_stock;
     const total = Number(stock?.operativo || 0) + Number(stock?.alquilado || 0)
         + Number(stock?.danado || 0) + Number(stock?.mantenimiento || 0) + Number(stock?.perdido || 0);
@@ -122,7 +126,7 @@ const AssetCard = ({ asset }: { asset: CourtAsset }) => {
         <View style={styles.assetCard}>
             <View style={styles.assetHeader}>
                 <View style={[styles.assetIcon, isBall ? styles.assetIconBall : styles.assetIconVest]}>
-                    <Icon size={rem(18)} color={isBall ? courtsColors.indigo : courtsColors.greenMid} strokeWidth={2.1} />
+                    <Icon size={rem(18)} color={isBall ? colors.indigo : colors.greenMid} strokeWidth={2.1} />
                 </View>
                 <View style={styles.assetTitleWrap}>
                     <Text style={styles.assetName} numberOfLines={1}>{asset.nombre}</Text>
@@ -160,7 +164,9 @@ const SummaryItem = ({
     value: number;
     tone: 'green' | 'indigo' | 'amber';
 }) => {
-    const color = tone === 'green' ? courtsColors.greenMid : tone === 'amber' ? courtsColors.amberText : courtsColors.indigo;
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    const color = tone === 'green' ? colors.greenMid : tone === 'amber' ? colors.amberText : colors.indigo;
     return (
         <View style={styles.summaryItem}>
             <Icon size={rem(15)} color={color} strokeWidth={2.2} />
@@ -170,28 +176,30 @@ const SummaryItem = ({
     );
 };
 
-const AssetStat = ({ label, value }: { label: string; value: number }) => (
-    <View style={styles.assetStat}>
-        <Text style={styles.assetStatLabel}>{label}</Text>
-        <Text style={styles.assetStatValue}>{value}</Text>
-    </View>
-);
+const AssetStat = ({ label, value }: { label: string; value: number }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    return (
+        <View style={styles.assetStat}>
+            <Text style={styles.assetStatLabel}>{label}</Text>
+            <Text style={styles.assetStatValue}>{value}</Text>
+        </View>
+    );
+};
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: courtsColors.background,
     },
     content: {
-        padding: rem(courtsSpacing.lg),
+        padding: rem(2),
         gap: rem(courtsSpacing.lg),
-        paddingBottom: rem(40),
+        paddingBottom: rem(24),
     },
     center: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: courtsColors.background,
     },
     summaryCard: {
         padding: rem(courtsSpacing.xxl),
@@ -206,19 +214,19 @@ const styles = StyleSheet.create({
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(courtsTypography.nano),
         letterSpacing: 1.2,
-        color: courtsColors.indigoDark,
+        color: colors.indigoDark,
     },
     summaryTitle: {
         marginTop: rem(3),
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(22),
-        color: courtsColors.text,
+        color: colors.text,
     },
     summaryIcon: {
         width: rem(46),
         height: rem(46),
         borderRadius: rem(15),
-        backgroundColor: courtsColors.indigoSoft,
+        backgroundColor: colors.indigoSoft,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -233,18 +241,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: rem(2),
         borderRadius: rem(courtsRadii.md),
-        backgroundColor: courtsColors.surfaceLow,
+        backgroundColor: colors.surfaceLow,
         paddingVertical: rem(10),
     },
     summaryValue: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(19),
-        color: courtsColors.text,
+        color: colors.text,
     },
     summaryLabel: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(courtsTypography.nano),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     grid: {
         flexDirection: 'row',
@@ -252,10 +260,10 @@ const styles = StyleSheet.create({
         gap: rem(12),
     },
     assetCard: {
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surface,
         borderRadius: rem(courtsRadii.card),
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         padding: rem(16),
         ...courtsShadow.card,
     },
@@ -272,10 +280,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     assetIconBall: {
-        backgroundColor: courtsColors.indigoSoft,
+        backgroundColor: colors.indigoSoft,
     },
     assetIconVest: {
-        backgroundColor: courtsColors.greenSoft,
+        backgroundColor: colors.greenSoft,
     },
     assetTitleWrap: {
         flex: 1,
@@ -284,36 +292,36 @@ const styles = StyleSheet.create({
     assetName: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(courtsTypography.cardTitle),
-        color: courtsColors.text,
+        color: colors.text,
     },
     assetMeta: {
         marginTop: rem(2),
         fontFamily: courtsFonts.semibold,
         fontSize: rem(courtsTypography.nano),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     stockPill: {
         borderRadius: rem(courtsRadii.pill),
-        backgroundColor: courtsColors.greenSoft,
+        backgroundColor: colors.greenSoft,
         paddingHorizontal: rem(8),
         paddingVertical: rem(4),
     },
     stockPillText: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(courtsTypography.nano),
-        color: courtsColors.greenMid,
+        color: colors.greenMid,
     },
     progressTrack: {
         marginTop: rem(12),
         height: rem(7),
         borderRadius: rem(4),
-        backgroundColor: courtsColors.surfaceLow,
+        backgroundColor: colors.surfaceLow,
         overflow: 'hidden',
     },
     progressFill: {
         height: '100%',
         borderRadius: rem(4),
-        backgroundColor: courtsColors.lime,
+        backgroundColor: colors.lime,
     },
     assetStats: {
         flexDirection: 'row',
@@ -330,11 +338,11 @@ const styles = StyleSheet.create({
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(7.5),
         letterSpacing: 0.4,
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
     },
     assetStatValue: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(14),
-        color: courtsColors.text,
+        color: colors.text,
     },
 });

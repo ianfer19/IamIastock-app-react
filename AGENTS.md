@@ -234,17 +234,20 @@ Archivo: `src/presentation/theme/index.ts`
 
 Archivo: `src/features/courts/theme/courtsTheme.ts`
 
-Canchas replica el look web (beige/indigo/verde cancha). **No** usa `useTheme()` para sus colores principales. Es intencional para mantener fidelidad visual con la web.
+Canchas conserva su identidad visual (indigo/verde cancha, tipografía Plus Jakarta Sans), pero ahora **sí respeta el tema global**: expone `courtsLightColors` y `courtsDarkColors`, y se consume con el hook `useCourtsColors()` (basado en `useTheme()`).
 
 Incluye:
 
-- `courtsColors`
+- `CourtsPalette`, `courtsLightColors`, `courtsDarkColors`, `getCourtsColors(mode)`
+- `useCourtsColors()` (obligatorio en componentes de Canchas)
 - `courtsFonts`
 - `courtsSpacing`
 - `courtsRadii`
 - `courtsTypography`
 - `courtsShadow`
 - `courtStatusTone()`
+
+Regla: nunca importes una paleta estática. Usa `const colors = useCourtsColors();` y `const styles = getStyles(colors);` dentro del componente (mismo patrón que `CajaScreen`).
 
 ### Fuentes
 
@@ -279,6 +282,7 @@ Las pantallas nuevas deben usar `rem()` para tamaños, spacing y radios, como el
 - `StatusModal` + `useStatusModal` → `src/core/context/StatusModalContext.tsx`.
 - `GlassCard` → `src/presentation/components/GlassCard.tsx`.
 - `PremiumButton` → `src/shared/components/PremiumButton.tsx`.
+- `ScreenShell` → `src/presentation/components/ScreenShell.tsx` (**layout estándar obligatorio** para pantallas).
 
 ### Canchas
 
@@ -286,6 +290,7 @@ Las pantallas nuevas deben usar `rem()` para tamaños, spacing y radios, como el
 - `CourtsHero` → hero del módulo (marcas de cancha + balón dibujados en SVG, alto reducido).
 - `CourtsNavBar` → barra de navegación estilo Ventas (`PosSubHeader`): iconos + etiqueta activa.
 - `CourtsAgendaFilters` → filtros de Agenda: vista día/semana/mes, canchas y “solo libres”, con navegación de período.
+- `CourtsAgendaMatrix` → agenda diaria horizontal: columna fija de canchas y scroll de horas (celda libre = nueva reserva, celda ocupada = detalle).
 - `CourtsUI` → `SectionCard`, `SectionHeader`, `FilterTabs`, `StatusPill`, `TagPill`, `EmptyState`, `PrimaryButton`, `IconButton`, `TextField`, `SwitchRow`, `DayChips`, `OptionChips`.
 - `CourtsModalShell` → modal base.
 - `CourtsConfirmModal` → confirmaciones destructivas.
@@ -393,7 +398,7 @@ BookingCreatePayload, CourtAsset, DayStats...
 - Filtros de Agenda: vista día/semana/mes, selector de canchas (incluye “Todas”) y “solo libres”.
 - Navegación de período: anterior, “Hoy” y siguiente (día/semana/mes).
 - Selector horizontal de canchas.
-- Timeline por slots de 60 minutos.
+- Agenda diaria horizontal: filas por cancha, columnas por hora, columna de canchas fija y auto-scroll a la hora actual.
 - Colores por estado de pago/reserva.
 - Crear reserva desde horario libre.
 - Cotización automática.
@@ -443,7 +448,6 @@ BookingCreatePayload, CourtAsset, DayStats...
 - Sorteo de equipos.
 - Generación/rotación de links públicos.
 - Actualización en tiempo real de la agenda (socket).
-- Dark mode específico de Canchas (hoy se mantiene look claro web).
 - Series/recurrencia en móvil.
 
 ### Backend relacionado
@@ -518,7 +522,39 @@ Antes de entregar:
 6. Crear la pantalla.
 7. Agregar el tab en `DashboardTab`.
 8. Agregar el `case` en `DashboardScreen`.
-9. Agregar el ítem en `Sidebar` (`NAV_ITEMS`).
+9. Agregar el ítem en `Sidebar` (`NAV_ITEMS`) y su condición de activo (`isActive`).
 10. Opcional: tarjeta en `UserDashboardScreen`.
 11. Verificar TypeScript y bundle.
 12. Documentar el módulo en este archivo.
+
+## 13. Layout estándar de pantallas (obligatorio)
+
+Toda pantalla nueva (y toda pantalla existente que se toque) debe usar el shell de `Ventas`/`Caja`. No inventes contenedores propios.
+
+```tsx
+import { DashboardHeader } from '@/features/pos/components/DashboardLayout';
+import { ScreenShell } from '@/presentation/components/ScreenShell';
+
+<View style={{ flex: 1, backgroundColor: colors.background }}>
+  <DashboardHeader />
+  {/* Navegación del módulo (opcional), estilo PosSubHeader / CourtsNavBar */}
+  <ScreenShell>
+    <ScrollView contentContainerStyle={{ padding: 2, gap: 12, paddingBottom: 24 }}>
+      {/* contenido */}
+    </ScrollView>
+  </ScreenShell>
+</View>
+```
+
+Reglas:
+
+- **Contenedor exterior:** `colors.background` del tema (`useTheme()`). Sin excepciones ni colores fijos.
+- **`ScreenShell`:** aplica los márgenes estándar (`paddingHorizontal: 12`, `paddingBottom: 12`) y la superficie tipo bento (`colors.surface`, radio 24-30, padding 12, borde y sombra). No lo dupliques dentro de la pantalla.
+- **Cards internas:** `colors.surfaceLow` + `borderColor: colors.border`, radio 20-24, padding 12-18. Nunca uses blanco fijo ni el mismo color del bento.
+- **Colores:** siempre desde `useTheme()` (o `useCourtsColors()` en Canchas). Prohibido hardcodear hex nuevos; si necesitas un tono, agrégalo a la paleta del tema.
+- **Tipografía/espaciado:** `rem()` obligatorio; usa `colors.text`, `textMuted`, `textSoft` para jerarquía.
+- **Estados:** todo listado debe cubrir loading (`ActivityIndicator`/`LoadingState`), vacío (`EmptyState`) y error accionable.
+- **Listas largas:** si el contenido es horizontal por naturaleza (ej. agenda de canchas), usa scroll horizontal con columna fija; no apiles horas verticalmente.
+- **Safe areas:** `useSafeAreaInsets()` en pantallas con footer, FAB o modales.
+- **Navegación:** el header global (`DashboardHeader`) se queda; no agregues encabezados duplicados con título de módulo ni botones "volver" si el menú lateral ya resuelve la salida.
+- **Sidebar:** cualquier tab nueva debe quedar resaltada en `Sidebar` mediante `currentTab` (`useNavigationState`) y su condición en `isActive`.

@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Calendar, CalendarDays, CalendarRange, ChevronLeft, ChevronRight, CircleCheck } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { rem } from '@/core/utils/responsive';
-import { courtsColors, courtsFonts, courtsRadii, courtsShadow, courtsTypography } from '../theme/courtsTheme';
+import { CourtsPalette, courtsFonts, courtsRadii, courtsShadow, courtsTypography, useCourtsColors } from '../theme/courtsTheme';
 
 export type CourtsAgendaViewMode = 'day' | 'week' | 'month';
 
@@ -50,6 +50,8 @@ export const CourtsAgendaFilters = ({
     onNext,
     onToday,
 }: CourtsAgendaFiltersProps) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const haptic = () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     return (
@@ -75,7 +77,7 @@ export const CourtsAgendaFilters = ({
                                 <Icon
                                     size={rem(12)}
                                     strokeWidth={2.3}
-                                    color={active ? courtsColors.indigo : courtsColors.textMuted}
+                                    color={active ? colors.indigo : colors.textMuted}
                                 />
                                 <Text style={[styles.segmentText, active && styles.segmentTextActive]}>{option.label}</Text>
                             </Pressable>
@@ -96,7 +98,7 @@ export const CourtsAgendaFilters = ({
                     <CircleCheck
                         size={rem(12)}
                         strokeWidth={2.3}
-                        color={freeOnly ? courtsColors.greenMid : courtsColors.textMuted}
+                        color={freeOnly ? colors.greenMid : colors.textMuted}
                     />
                     <Text style={[styles.freeToggleText, freeOnly && styles.freeToggleTextActive]}>Solo libres</Text>
                 </Pressable>
@@ -154,13 +156,13 @@ export const CourtsAgendaFilters = ({
             <View style={styles.periodRow}>
                 <View style={styles.periodNav}>
                     <Pressable onPress={onPrev} style={styles.periodButton} accessibilityLabel="Período anterior" hitSlop={6}>
-                        <ChevronLeft size={rem(14)} color={courtsColors.indigo} strokeWidth={2.6} />
+                        <ChevronLeft size={rem(14)} color={colors.indigo} strokeWidth={2.6} />
                     </Pressable>
                     <Pressable onPress={onToday} style={styles.periodToday} accessibilityLabel="Ir a hoy">
                         <Text style={styles.periodTodayText}>Hoy</Text>
                     </Pressable>
                     <Pressable onPress={onNext} style={styles.periodButton} accessibilityLabel="Período siguiente" hitSlop={6}>
-                        <ChevronRight size={rem(14)} color={courtsColors.indigo} strokeWidth={2.6} />
+                        <ChevronRight size={rem(14)} color={colors.indigo} strokeWidth={2.6} />
                     </Pressable>
                 </View>
 
@@ -173,7 +175,7 @@ export const CourtsAgendaFilters = ({
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     wrapper: {
         gap: rem(8),
     },
@@ -190,9 +192,9 @@ const styles = StyleSheet.create({
         gap: rem(2),
         padding: rem(3),
         borderRadius: rem(courtsRadii.pill),
-        backgroundColor: courtsColors.surfaceLow,
+        backgroundColor: colors.surfaceLow,
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
     },
     segmentItem: {
         flexDirection: 'row',
@@ -203,16 +205,16 @@ const styles = StyleSheet.create({
         borderRadius: rem(courtsRadii.pill),
     },
     segmentItemActive: {
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surface,
         ...courtsShadow.soft,
     },
     segmentText: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(courtsTypography.micro),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     segmentTextActive: {
-        color: courtsColors.indigo,
+        color: colors.indigo,
     },
     freeToggle: {
         flexDirection: 'row',
@@ -222,20 +224,20 @@ const styles = StyleSheet.create({
         paddingHorizontal: rem(10),
         borderRadius: rem(courtsRadii.pill),
         borderWidth: 1,
-        borderColor: courtsColors.border,
-        backgroundColor: courtsColors.surface,
+        borderColor: colors.border,
+        backgroundColor: colors.surface,
     },
     freeToggleActive: {
-        backgroundColor: courtsColors.greenSoft,
-        borderColor: '#86EFAC',
+        backgroundColor: colors.greenSoft,
+        borderColor: colors.greenBorder,
     },
     freeToggleText: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(courtsTypography.micro),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     freeToggleTextActive: {
-        color: courtsColors.greenMid,
+        color: colors.greenMid,
     },
     courts: {
         gap: rem(6),
@@ -246,34 +248,34 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: rem(5),
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         borderRadius: rem(courtsRadii.pill),
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surface,
         paddingHorizontal: rem(11),
         paddingVertical: rem(6),
         minHeight: rem(32),
         maxWidth: rem(180),
     },
     courtChipActive: {
-        backgroundColor: courtsColors.green,
-        borderColor: courtsColors.green,
+        backgroundColor: colors.green,
+        borderColor: colors.green,
     },
     courtChipText: {
         flexShrink: 1,
         fontFamily: courtsFonts.bold,
         fontSize: rem(courtsTypography.micro),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     courtChipTextActive: {
-        color: courtsColors.white,
+        color: colors.white,
     },
     courtChipMeta: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(7),
-        color: courtsColors.greenMid,
+        color: colors.greenMid,
     },
     courtChipMetaActive: {
-        color: courtsColors.lime,
+        color: colors.lime,
     },
     periodRow: {
         flexDirection: 'row',
@@ -286,9 +288,9 @@ const styles = StyleSheet.create({
         gap: rem(3),
         padding: rem(3),
         borderRadius: rem(courtsRadii.pill),
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surface,
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         ...courtsShadow.soft,
     },
     periodButton: {
@@ -297,7 +299,7 @@ const styles = StyleSheet.create({
         borderRadius: rem(14),
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: courtsColors.indigoSoft,
+        backgroundColor: colors.indigoSoft,
     },
     periodToday: {
         minWidth: rem(40),
@@ -306,13 +308,13 @@ const styles = StyleSheet.create({
         borderRadius: rem(14),
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: courtsColors.surfaceLow,
+        backgroundColor: colors.surfaceLow,
     },
     periodTodayText: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(9),
         letterSpacing: 0.4,
-        color: courtsColors.indigoDark,
+        color: colors.indigoDark,
     },
     periodCopy: {
         flex: 1,
@@ -322,14 +324,14 @@ const styles = StyleSheet.create({
     periodLabel: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(12),
-        color: courtsColors.text,
+        color: colors.text,
         textTransform: 'capitalize',
     },
     periodCaption: {
         fontFamily: courtsFonts.semibold,
         fontSize: rem(8),
         letterSpacing: 0.5,
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
         textTransform: 'uppercase',
     },
 });

@@ -35,12 +35,13 @@ import {
     roundAmount,
 } from '../utils/formatters';
 import {
-    courtsColors,
+    CourtsPalette,
     courtsFonts,
     courtsRadii,
     courtsShadow,
     courtsSpacing,
     courtsTypography,
+    useCourtsColors,
 } from '../theme/courtsTheme';
 import { CourtsHero, CourtHeroStat } from '../components/CourtsHero';
 import {
@@ -62,6 +63,8 @@ import { CourtsConfirmModal } from '../components/CourtsConfirmModal';
 type PricingTab = 'RATES' | 'PROMOTIONS';
 
 export const CourtsPricingScreen = () => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const { width } = useWindowDimensions();
     const twoColumns = width >= 760;
     const [courts, setCourts] = useState<Court[]>([]);
@@ -243,7 +246,7 @@ export const CourtsPricingScreen = () => {
     if (loading) {
         return (
             <View style={styles.center}>
-                <ActivityIndicator color={courtsColors.indigo} />
+                <ActivityIndicator color={colors.indigo} />
             </View>
         );
     }
@@ -258,7 +261,7 @@ export const CourtsPricingScreen = () => {
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={() => void load(true)}
-                        tintColor={courtsColors.indigo}
+                        tintColor={colors.indigo}
                     />
                 )}
             >
@@ -277,7 +280,7 @@ export const CourtsPricingScreen = () => {
                         onPress={() => setTab('RATES')}
                         style={[styles.tab, tab === 'RATES' && styles.tabActive]}
                     >
-                        <Percent size={rem(13)} color={tab === 'RATES' ? courtsColors.white : courtsColors.textMuted} />
+                        <Percent size={rem(13)} color={tab === 'RATES' ? colors.white : colors.textMuted} />
                         <Text style={[styles.tabText, tab === 'RATES' && styles.tabTextActive]}>Tarifas</Text>
                         <View style={[styles.tabCount, tab === 'RATES' && styles.tabCountActive]}>
                             <Text style={[styles.tabCountText, tab === 'RATES' && styles.tabCountTextActive]}>{rates.length}</Text>
@@ -287,7 +290,7 @@ export const CourtsPricingScreen = () => {
                         onPress={() => setTab('PROMOTIONS')}
                         style={[styles.tab, tab === 'PROMOTIONS' && styles.tabActive]}
                     >
-                        <Ticket size={rem(13)} color={tab === 'PROMOTIONS' ? courtsColors.white : courtsColors.textMuted} />
+                        <Ticket size={rem(13)} color={tab === 'PROMOTIONS' ? colors.white : colors.textMuted} />
                         <Text style={[styles.tabText, tab === 'PROMOTIONS' && styles.tabTextActive]}>Promociones</Text>
                         <View style={[styles.tabCount, tab === 'PROMOTIONS' && styles.tabCountActive]}>
                             <Text style={[styles.tabCountText, tab === 'PROMOTIONS' && styles.tabCountTextActive]}>{promotions.length}</Text>
@@ -482,41 +485,45 @@ const RateCard = ({
     onEdit: () => void;
     onDelete: () => void;
     onReactivate: () => void;
-}) => (
-    <View style={[styles.rateCard, rate.active === false && styles.off]}>
-        <View style={styles.rateTopRow}>
-            <View style={styles.rateMain}>
-                <View style={styles.rateTitleRow}>
-                    <Text style={styles.rateName}>{rate.name}</Text>
-                    <StatusPill label={rate.active === false ? 'Inactiva' : 'Activa'} tone={rate.active === false ? 'inactive' : 'active'} />
-                    <TagPill label={rate.scope === 'STORE' ? 'Tienda' : 'Cancha'} />
+}) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    return (
+        <View style={[styles.rateCard, rate.active === false && styles.off]}>
+            <View style={styles.rateTopRow}>
+                <View style={styles.rateMain}>
+                    <View style={styles.rateTitleRow}>
+                        <Text style={styles.rateName}>{rate.name}</Text>
+                        <StatusPill label={rate.active === false ? 'Inactiva' : 'Activa'} tone={rate.active === false ? 'inactive' : 'active'} />
+                        <TagPill label={rate.scope === 'STORE' ? 'Tienda' : 'Cancha'} />
+                    </View>
+                    <Text style={styles.rateMeta}>
+                        {rate.start_time} – {rate.end_time} · prioridad {rate.priority}
+                    </Text>
+                    <View style={styles.days}>
+                        {(rate.days_of_week || []).length ? rate.days_of_week.map(day => (
+                            <Text key={day} style={styles.dayPill}>{dayLabel(day)}</Text>
+                        )) : <Text style={styles.dayPill}>Todos los días</Text>}
+                    </View>
                 </View>
-                <Text style={styles.rateMeta}>
-                    {rate.start_time} – {rate.end_time} · prioridad {rate.priority}
-                </Text>
-                <View style={styles.days}>
-                    {(rate.days_of_week || []).length ? rate.days_of_week.map(day => (
-                        <Text key={day} style={styles.dayPill}>{dayLabel(day)}</Text>
-                    )) : <Text style={styles.dayPill}>Todos los días</Text>}
+                <View style={styles.rateSide}>
+                    <Text style={styles.ratePrice}>{formatMoneyNoDecimals(rate.price_per_hour)}</Text>
+                    <Text style={styles.ratePriceLabel}>por hora</Text>
                 </View>
             </View>
-            <View style={styles.rateSide}>
-                <Text style={styles.ratePrice}>{formatMoneyNoDecimals(rate.price_per_hour)}</Text>
-                <Text style={styles.ratePriceLabel}>por hora</Text>
+            <View style={styles.rateActions}>
+                {rate.active === false ? (
+                    <PrimaryButton label="Reactivar" variant="ghost" compact icon={RotateCcw} onPress={onReactivate} />
+                ) : (
+                    <>
+                        <IconButton icon={Pencil} label="Editar tarifa" onPress={onEdit} />
+                        <IconButton icon={Trash2} label="Desactivar tarifa" variant="danger" onPress={onDelete} />
+                    </>
+                )}
             </View>
         </View>
-        <View style={styles.rateActions}>
-            {rate.active === false ? (
-                <PrimaryButton label="Reactivar" variant="ghost" compact icon={RotateCcw} onPress={onReactivate} />
-            ) : (
-                <>
-                    <IconButton icon={Pencil} label="Editar tarifa" onPress={onEdit} />
-                    <IconButton icon={Trash2} label="Desactivar tarifa" variant="danger" onPress={onDelete} />
-                </>
-            )}
-        </View>
-    </View>
-);
+    );
+};
 
 const PromoCard = ({
     promotion,
@@ -531,6 +538,8 @@ const PromoCard = ({
     onExceptions: () => void;
     onReactivate: () => void;
 }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const image = promotion.images?.[0] || null;
     return (
         <View style={[styles.promoCard, promotion.active === false && styles.off]}>
@@ -561,7 +570,7 @@ const PromoCard = ({
                 </View>
                 {promotion.code ? (
                     <View style={styles.promoCode}>
-                        <Ticket size={rem(9)} color={courtsColors.indigoDark} />
+                        <Ticket size={rem(9)} color={colors.indigoDark} />
                         <Text style={styles.promoCodeText}>{promotion.code}</Text>
                     </View>
                 ) : null}
@@ -581,29 +590,27 @@ const PromoCard = ({
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     flex: { flex: 1 },
     center: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: courtsColors.background,
     },
     container: {
         flex: 1,
-        backgroundColor: courtsColors.background,
     },
     content: {
-        padding: rem(courtsSpacing.lg),
+        padding: rem(2),
         gap: rem(courtsSpacing.lg),
-        paddingBottom: rem(40),
+        paddingBottom: rem(24),
     },
     tabs: {
         flexDirection: 'row',
         gap: rem(6),
         padding: rem(5),
         borderRadius: rem(courtsRadii.lg),
-        backgroundColor: courtsColors.surfaceLow,
+        backgroundColor: colors.surfaceLow,
     },
     tab: {
         flex: 1,
@@ -616,36 +623,36 @@ const styles = StyleSheet.create({
         minHeight: rem(42),
     },
     tabActive: {
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surface,
         ...courtsShadow.soft,
     },
     tabText: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(11),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     tabTextActive: {
-        color: courtsColors.text,
+        color: colors.text,
     },
     tabCount: {
         minWidth: rem(17),
         height: rem(17),
         borderRadius: rem(9),
-        backgroundColor: courtsColors.indigoSoft,
+        backgroundColor: colors.indigoSoft,
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: rem(4),
     },
     tabCountActive: {
-        backgroundColor: courtsColors.indigo,
+        backgroundColor: colors.indigo,
     },
     tabCountText: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(8),
-        color: courtsColors.indigoDark,
+        color: colors.indigoDark,
     },
     tabCountTextActive: {
-        color: courtsColors.white,
+        color: colors.white,
     },
     courtChips: {
         gap: rem(6),
@@ -654,24 +661,24 @@ const styles = StyleSheet.create({
     },
     courtChip: {
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         borderRadius: rem(courtsRadii.pill),
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surface,
         paddingHorizontal: rem(12),
         paddingVertical: rem(8),
         maxWidth: rem(160),
     },
     courtChipActive: {
-        backgroundColor: courtsColors.indigo,
-        borderColor: courtsColors.indigo,
+        backgroundColor: colors.indigo,
+        borderColor: colors.indigo,
     },
     courtChipText: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(10),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     courtChipTextActive: {
-        color: courtsColors.white,
+        color: colors.white,
     },
     list: {
         gap: rem(10),
@@ -679,9 +686,9 @@ const styles = StyleSheet.create({
     },
     rateCard: {
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         borderRadius: rem(courtsRadii.xl),
-        backgroundColor: courtsColors.surfaceLow,
+        backgroundColor: colors.surfaceLow,
         padding: rem(14),
         gap: rem(8),
     },
@@ -707,12 +714,12 @@ const styles = StyleSheet.create({
     rateName: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(13),
-        color: courtsColors.text,
+        color: colors.text,
     },
     rateMeta: {
         fontFamily: courtsFonts.semibold,
         fontSize: rem(10),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     days: {
         flexDirection: 'row',
@@ -723,8 +730,8 @@ const styles = StyleSheet.create({
     dayPill: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(8),
-        color: courtsColors.indigoDark,
-        backgroundColor: courtsColors.indigoSoft,
+        color: colors.indigoDark,
+        backgroundColor: colors.indigoSoft,
         borderRadius: rem(courtsRadii.pill),
         paddingHorizontal: rem(7),
         paddingVertical: rem(3),
@@ -736,12 +743,12 @@ const styles = StyleSheet.create({
     ratePrice: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(16),
-        color: courtsColors.green,
+        color: colors.green,
     },
     ratePriceLabel: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(8),
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
     },
     rateActions: {
         flexDirection: 'row',
@@ -756,15 +763,15 @@ const styles = StyleSheet.create({
     },
     promoCard: {
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         borderRadius: rem(courtsRadii.xxl),
-        backgroundColor: courtsColors.surfaceLow,
+        backgroundColor: colors.surfaceLow,
         overflow: 'hidden',
         ...courtsShadow.card,
     },
     promoMedia: {
         aspectRatio: 16 / 9,
-        backgroundColor: '#E9E4DA',
+        backgroundColor: colors.borderSoft,
     },
     promoImage: {
         width: '100%',
@@ -774,7 +781,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: courtsColors.indigoDark,
+        backgroundColor: colors.indigoDark,
     },
     promoStatus: {
         position: 'absolute',
@@ -793,7 +800,7 @@ const styles = StyleSheet.create({
     promoValueText: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(11),
-        color: '#D9F99D',
+        color: colors.limeSoft,
     },
     promoBody: {
         paddingHorizontal: rem(14),
@@ -804,12 +811,12 @@ const styles = StyleSheet.create({
     promoName: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(14),
-        color: courtsColors.text,
+        color: colors.text,
     },
     promoMeta: {
         fontFamily: courtsFonts.semibold,
         fontSize: rem(9),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     promoCode: {
         flexDirection: 'row',
@@ -818,14 +825,14 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
         marginTop: rem(6),
         borderRadius: rem(courtsRadii.pill),
-        backgroundColor: courtsColors.indigoSoft,
+        backgroundColor: colors.indigoSoft,
         paddingHorizontal: rem(8),
         paddingVertical: rem(4),
     },
     promoCodeText: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(9),
-        color: courtsColors.indigoDark,
+        color: colors.indigoDark,
     },
     promoActions: {
         flexDirection: 'row',

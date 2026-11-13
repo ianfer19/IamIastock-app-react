@@ -7,7 +7,13 @@ import { CourtsService } from '../services/courtsService';
 import { CourtUploadService } from '../services/courtUploadService';
 import { Promotion } from '../types/courts.types';
 import { courtErrorMessage, roundAmount, timeToMinutes } from '../utils/formatters';
-import { courtsColors, courtsFonts, courtsRadii, courtsTypography } from '../theme/courtsTheme';
+import {
+    CourtsPalette,
+    courtsFonts,
+    courtsRadii,
+    courtsTypography,
+    useCourtsColors,
+} from '../theme/courtsTheme';
 import { CourtsModalShell } from './CourtsModalShell';
 import { DayChips, Field, OptionChips, PrimaryButton, SwitchRow, TextField } from './CourtsUI';
 
@@ -34,6 +40,8 @@ export const PromotionFormModal = ({
     onClose: () => void;
     onSaved: () => void;
 }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const [name, setName] = useState('');
     const [code, setCode] = useState('');
     const [type, setType] = useState<Promotion['type']>('PERCENT');
@@ -197,7 +205,7 @@ export const PromotionFormModal = ({
                     <View style={styles.imagePreview}>
                         <Image source={{ uri: image }} style={styles.image} resizeMode="cover" />
                         <Pressable onPress={() => setImage(null)} style={styles.removeImage} hitSlop={6}>
-                            <X size={rem(12)} color={courtsColors.white} />
+                            <X size={rem(12)} color={colors.white} />
                         </Pressable>
                     </View>
                 ) : (
@@ -205,7 +213,7 @@ export const PromotionFormModal = ({
                         onPress={() => void pickImage()}
                         style={({ pressed }) => [styles.imageDrop, pressed && styles.pressed]}
                     >
-                        <ImagePlus size={rem(22)} color={courtsColors.indigo} strokeWidth={2} />
+                        <ImagePlus size={rem(22)} color={colors.indigo} strokeWidth={2} />
                         <Text style={styles.imageDropText}>{uploading ? 'Subiendo…' : 'Subir imagen'}</Text>
                         <Text style={styles.imageDropHint}>JPG, PNG, WEBP · máximo 5MB</Text>
                     </Pressable>
@@ -219,7 +227,7 @@ export const PromotionFormModal = ({
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -234,7 +242,7 @@ const styles = StyleSheet.create({
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(courtsTypography.micro),
         letterSpacing: 0.3,
-        color: '#4B4B63',
+        color: colors.label,
         textTransform: 'uppercase',
         marginBottom: rem(6),
     },
@@ -242,15 +250,15 @@ const styles = StyleSheet.create({
         marginTop: rem(5),
         fontFamily: courtsFonts.medium,
         fontSize: rem(courtsTypography.nano),
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
     },
     imageDrop: {
         minHeight: rem(100),
         borderRadius: rem(courtsRadii.md),
         borderWidth: 1,
         borderStyle: 'dashed',
-        borderColor: courtsColors.borderStrong,
-        backgroundColor: courtsColors.background,
+        borderColor: colors.borderStrong,
+        backgroundColor: colors.background,
         alignItems: 'center',
         justifyContent: 'center',
         gap: rem(4),
@@ -258,12 +266,12 @@ const styles = StyleSheet.create({
     imageDropText: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(11),
-        color: courtsColors.indigo,
+        color: colors.indigo,
     },
     imageDropHint: {
         fontFamily: courtsFonts.medium,
         fontSize: rem(8),
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
     },
     imagePreview: {
         borderRadius: rem(courtsRadii.md),
@@ -292,10 +300,10 @@ const styles = StyleSheet.create({
         fontFamily: courtsFonts.semibold,
         fontSize: rem(courtsTypography.caption),
         lineHeight: rem(16),
-        color: courtsColors.danger,
-        backgroundColor: courtsColors.dangerSoft,
+        color: colors.danger,
+        backgroundColor: colors.dangerSoft,
         borderWidth: 1,
-        borderColor: courtsColors.dangerBorder,
+        borderColor: colors.dangerBorder,
         borderRadius: rem(courtsRadii.sm),
         paddingHorizontal: rem(12),
         paddingVertical: rem(10),

@@ -13,7 +13,15 @@ import {
 import { X } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { rem } from '@/core/utils/responsive';
-import { courtsColors, courtsFonts, courtsRadii, courtsShadow, courtsSpacing, courtsTypography } from '../theme/courtsTheme';
+import {
+    CourtsPalette,
+    courtsFonts,
+    courtsRadii,
+    courtsShadow,
+    courtsSpacing,
+    courtsTypography,
+    useCourtsColors,
+} from '../theme/courtsTheme';
 
 interface CourtsModalShellProps {
     visible: boolean;
@@ -36,6 +44,8 @@ export const CourtsModalShell = ({
 }: CourtsModalShellProps) => {
     const insets = useSafeAreaInsets();
     const { width } = useWindowDimensions();
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const isPhone = width < 640;
     const maxWidth = size === 'sm' ? 520 : size === 'lg' ? 820 : 680;
 
@@ -72,7 +82,7 @@ export const CourtsModalShell = ({
                                 accessibilityRole="button"
                                 accessibilityLabel="Cerrar"
                             >
-                                <X size={rem(16)} color={courtsColors.text} strokeWidth={2.4} />
+                                <X size={rem(16)} color={colors.text} strokeWidth={2.4} />
                             </Pressable>
                         </View>
 
@@ -93,13 +103,13 @@ export const CourtsModalShell = ({
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     keyboard: {
         flex: 1,
     },
     overlay: {
         flex: 1,
-        backgroundColor: courtsColors.overlay,
+        backgroundColor: colors.overlay,
         justifyContent: 'center',
         alignItems: 'center',
         padding: rem(16),
@@ -107,7 +117,7 @@ const styles = StyleSheet.create({
     card: {
         width: '100%',
         maxHeight: '92%',
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surface,
         borderRadius: rem(courtsRadii.hero),
         overflow: 'hidden',
         ...courtsShadow.card,
@@ -125,9 +135,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: rem(courtsSpacing.xxl),
         paddingTop: rem(20),
         paddingBottom: rem(10),
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surface,
         borderBottomWidth: 1,
-        borderBottomColor: '#F1F5F9',
+        borderBottomColor: colors.divider,
     },
     headerCopy: {
         flex: 1,
@@ -136,8 +146,8 @@ const styles = StyleSheet.create({
     eyebrow: {
         alignSelf: 'flex-start',
         borderRadius: rem(courtsRadii.pill),
-        backgroundColor: '#E4E6FF',
-        color: courtsColors.indigoDark,
+        backgroundColor: colors.indigoMuted,
+        color: colors.indigoDark,
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(courtsTypography.nano),
         letterSpacing: 1,
@@ -151,13 +161,13 @@ const styles = StyleSheet.create({
         fontSize: rem(21),
         lineHeight: rem(25),
         letterSpacing: -0.4,
-        color: courtsColors.text,
+        color: colors.text,
     },
     closeButton: {
         width: rem(36),
         height: rem(36),
         borderRadius: rem(18),
-        backgroundColor: courtsColors.surfaceLow,
+        backgroundColor: colors.surfaceLow,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -181,7 +191,7 @@ const styles = StyleSheet.create({
         paddingTop: rem(12),
         paddingBottom: rem(12),
         borderTopWidth: 1,
-        borderTopColor: '#F1F5F9',
-        backgroundColor: courtsColors.surface,
+        borderTopColor: colors.divider,
+        backgroundColor: colors.surface,
     },
 });

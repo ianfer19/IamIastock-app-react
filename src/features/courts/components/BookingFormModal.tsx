@@ -5,7 +5,7 @@ import { rem } from '@/core/utils/responsive';
 import { CourtsService } from '../services/courtsService';
 import { Court, PriceBreakdown } from '../types/courts.types';
 import { courtErrorMessage, formatMoneyNoDecimals, isoDate, timeToMinutes } from '../utils/formatters';
-import { courtsColors, courtsFonts, courtsRadii, courtsTypography } from '../theme/courtsTheme';
+import { CourtsPalette, courtsFonts, courtsRadii, courtsTypography, useCourtsColors } from '../theme/courtsTheme';
 import { CourtsModalShell } from './CourtsModalShell';
 import { Field, OptionChips, PrimaryButton, TextField } from './CourtsUI';
 
@@ -28,6 +28,8 @@ export const BookingFormModal = ({
     onClose: () => void;
     onSaved: () => void;
 }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const [courtId, setCourtId] = useState('');
     const [date, setDate] = useState(isoDate());
     const [startTime, setStartTime] = useState('18:00');
@@ -208,7 +210,7 @@ export const BookingFormModal = ({
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -222,8 +224,8 @@ const styles = StyleSheet.create({
     quoteBox: {
         borderRadius: rem(courtsRadii.md),
         borderWidth: 1,
-        borderColor: courtsColors.border,
-        backgroundColor: courtsColors.background,
+        borderColor: colors.border,
+        backgroundColor: colors.background,
         padding: rem(12),
         gap: rem(6),
     },
@@ -237,47 +239,47 @@ const styles = StyleSheet.create({
         flex: 1,
         fontFamily: courtsFonts.medium,
         fontSize: rem(10),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     quoteValue: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(10),
-        color: courtsColors.text,
+        color: colors.text,
     },
     quoteDiscount: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(10),
-        color: courtsColors.greenMid,
+        color: colors.greenMid,
     },
     quoteTotal: {
         borderTopWidth: 1,
-        borderTopColor: courtsColors.border,
+        borderTopColor: colors.border,
         paddingTop: rem(7),
         marginTop: rem(2),
     },
     quoteTotalLabel: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(12),
-        color: courtsColors.text,
+        color: colors.text,
     },
     quoteTotalValue: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(14),
-        color: courtsColors.text,
+        color: colors.text,
     },
     quoteMuted: {
         fontFamily: courtsFonts.medium,
         fontSize: rem(10),
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
     },
     errorText: {
         fontFamily: courtsFonts.semibold,
         fontSize: rem(courtsTypography.caption),
         lineHeight: rem(16),
-        color: courtsColors.danger,
-        backgroundColor: courtsColors.dangerSoft,
+        color: colors.danger,
+        backgroundColor: colors.dangerSoft,
         borderWidth: 1,
-        borderColor: courtsColors.dangerBorder,
+        borderColor: colors.dangerBorder,
         borderRadius: rem(courtsRadii.sm),
         paddingHorizontal: rem(12),
         paddingVertical: rem(10),

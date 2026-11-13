@@ -17,11 +17,12 @@ import { CourtUploadService } from '../services/courtUploadService';
 import { Court, CourtAttributeDef } from '../types/courts.types';
 import { courtErrorMessage, roundAmount } from '../utils/formatters';
 import {
-    courtsColors,
+    CourtsPalette,
     courtsFonts,
     courtsRadii,
     courtsSpacing,
     courtsTypography,
+    useCourtsColors,
 } from '../theme/courtsTheme';
 import { CourtsModalShell } from './CourtsModalShell';
 import { Field, OptionChips, PrimaryButton, SwitchRow, TextField } from './CourtsUI';
@@ -73,6 +74,8 @@ export const CourtFormModal = ({
     onClose,
     onSaved,
 }: CourtFormModalProps) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const [name, setName] = useState('');
     const [footballType, setFootballType] = useState<Court['football_type']>('F5');
     const [surface, setSurface] = useState<Court['surface']>('SYNTHETIC');
@@ -275,7 +278,7 @@ export const CourtFormModal = ({
                         accessibilityRole="button"
                         accessibilityLabel="Subir imagen"
                     >
-                        <ImagePlus size={rem(22)} color={courtsColors.indigo} strokeWidth={2} />
+                        <ImagePlus size={rem(22)} color={colors.indigo} strokeWidth={2} />
                         <Text style={styles.addImageText}>{uploading ? 'Subiendo…' : 'Subir'}</Text>
                     </Pressable>
                     {images.map((image, index) => (
@@ -289,7 +292,7 @@ export const CourtFormModal = ({
                             <View style={styles.imageActions}>
                                 {index > 0 ? (
                                     <Pressable onPress={() => makeCover(index)} style={styles.imageAction} hitSlop={4}>
-                                        <Star size={rem(10)} color={courtsColors.white} />
+                                        <Star size={rem(10)} color={colors.white} />
                                     </Pressable>
                                 ) : null}
                                 <Pressable
@@ -297,7 +300,7 @@ export const CourtFormModal = ({
                                     style={styles.imageAction}
                                     hitSlop={4}
                                 >
-                                    <X size={rem(10)} color={courtsColors.white} />
+                                    <X size={rem(10)} color={colors.white} />
                                 </Pressable>
                             </View>
                         </View>
@@ -314,8 +317,8 @@ export const CourtFormModal = ({
                                 <Switch
                                     value={hour.open}
                                     onValueChange={open => updateHour(index, { open })}
-                                    trackColor={{ false: courtsColors.border, true: courtsColors.indigo }}
-                                    thumbColor={courtsColors.white}
+                                    trackColor={{ false: colors.border, true: colors.indigo }}
+                                    thumbColor={colors.white}
                                 />
                             </View>
                             <TextInput
@@ -323,7 +326,7 @@ export const CourtFormModal = ({
                                 onChangeText={start => updateHour(index, { start })}
                                 editable={hour.open}
                                 placeholder="06:00"
-                                placeholderTextColor={courtsColors.textSoft}
+                                placeholderTextColor={colors.textSoft}
                                 style={[styles.hourInput, !hour.open && styles.inputDisabled]}
                             />
                             <TextInput
@@ -331,7 +334,7 @@ export const CourtFormModal = ({
                                 onChangeText={end => updateHour(index, { end })}
                                 editable={hour.open}
                                 placeholder="24:00"
-                                placeholderTextColor={courtsColors.textSoft}
+                                placeholderTextColor={colors.textSoft}
                                 style={[styles.hourInput, !hour.open && styles.inputDisabled]}
                             />
                         </View>
@@ -387,7 +390,7 @@ export const CourtFormModal = ({
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     formGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -413,8 +416,8 @@ const styles = StyleSheet.create({
         borderRadius: rem(courtsRadii.sm),
         borderWidth: 1,
         borderStyle: 'dashed',
-        borderColor: courtsColors.borderStrong,
-        backgroundColor: courtsColors.background,
+        borderColor: colors.borderStrong,
+        backgroundColor: colors.background,
         alignItems: 'center',
         justifyContent: 'center',
         gap: rem(4),
@@ -422,14 +425,14 @@ const styles = StyleSheet.create({
     addImageText: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(9),
-        color: courtsColors.indigo,
+        color: colors.indigo,
     },
     imageTile: {
         width: rem(92),
         height: rem(70),
         borderRadius: rem(courtsRadii.sm),
         overflow: 'hidden',
-        backgroundColor: courtsColors.border,
+        backgroundColor: colors.border,
     },
     image: {
         width: '100%',
@@ -447,7 +450,7 @@ const styles = StyleSheet.create({
     coverTagText: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(7),
-        color: '#D9F99D',
+        color: colors.limeSoft,
     },
     imageActions: {
         position: 'absolute',
@@ -482,21 +485,21 @@ const styles = StyleSheet.create({
     hourDayText: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(10),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     hourInput: {
         width: rem(64),
         minHeight: rem(38),
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         borderRadius: rem(courtsRadii.xs),
-        backgroundColor: courtsColors.background,
+        backgroundColor: colors.background,
         paddingHorizontal: rem(8),
         paddingVertical: rem(6),
         textAlign: 'center',
         fontFamily: courtsFonts.medium,
         fontSize: rem(11),
-        color: courtsColors.text,
+        color: colors.text,
     },
     inputDisabled: {
         opacity: 0.45,
@@ -507,16 +510,16 @@ const styles = StyleSheet.create({
     mutedText: {
         fontFamily: courtsFonts.medium,
         fontSize: rem(courtsTypography.caption),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     errorText: {
         fontFamily: courtsFonts.semibold,
         fontSize: rem(courtsTypography.caption),
         lineHeight: rem(16),
-        color: courtsColors.danger,
-        backgroundColor: courtsColors.dangerSoft,
+        color: colors.danger,
+        backgroundColor: colors.dangerSoft,
         borderWidth: 1,
-        borderColor: courtsColors.dangerBorder,
+        borderColor: colors.dangerBorder,
         borderRadius: rem(courtsRadii.sm),
         paddingHorizontal: rem(12),
         paddingVertical: rem(10),

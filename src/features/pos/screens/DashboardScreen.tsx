@@ -230,7 +230,7 @@ export const DashboardScreen = (props: any) => {
         </View>
       );
     case 'CANCHAS' as any:
-      return <CourtsModuleScreen onBack={() => changeTab('HOME')} />;
+      return <CourtsModuleScreen />;
     default:
       return (
         <View style={styles.container}>

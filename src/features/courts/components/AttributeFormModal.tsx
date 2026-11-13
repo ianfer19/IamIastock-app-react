@@ -10,7 +10,13 @@ import {
     sanitizeAttributeKey,
     slugifyAttributeKey,
 } from '../utils/formatters';
-import { courtsColors, courtsFonts, courtsRadii, courtsTypography } from '../theme/courtsTheme';
+import {
+    CourtsPalette,
+    courtsFonts,
+    courtsRadii,
+    courtsTypography,
+    useCourtsColors,
+} from '../theme/courtsTheme';
 import { CourtsModalShell } from './CourtsModalShell';
 import { OptionChips, PrimaryButton, SwitchRow, TextField } from './CourtsUI';
 
@@ -32,6 +38,8 @@ export const AttributeFormModal = ({
     onClose: () => void;
     onSaved: () => void;
 }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const [label, setLabel] = useState('');
     const [key, setKey] = useState('');
     const [type, setType] = useState<CourtAttributeDef['type']>('BOOLEAN');
@@ -142,15 +150,15 @@ export const AttributeFormModal = ({
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     errorText: {
         fontFamily: courtsFonts.semibold,
         fontSize: rem(courtsTypography.caption),
         lineHeight: rem(16),
-        color: courtsColors.danger,
-        backgroundColor: courtsColors.dangerSoft,
+        color: colors.danger,
+        backgroundColor: colors.dangerSoft,
         borderWidth: 1,
-        borderColor: courtsColors.dangerBorder,
+        borderColor: colors.dangerBorder,
         borderRadius: rem(courtsRadii.sm),
         paddingHorizontal: rem(12),
         paddingVertical: rem(10),

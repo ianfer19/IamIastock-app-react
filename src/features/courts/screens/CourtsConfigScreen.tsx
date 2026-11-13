@@ -28,11 +28,12 @@ import {
     formatDateShort,
 } from '../utils/formatters';
 import {
-    courtsColors,
+    CourtsPalette,
     courtsFonts,
     courtsRadii,
     courtsSpacing,
     courtsTypography,
+    useCourtsColors,
 } from '../theme/courtsTheme';
 import { CourtsHero, CourtHeroStat } from '../components/CourtsHero';
 import {
@@ -57,6 +58,8 @@ type AttributeFilter = 'ACTIVE' | 'ALL';
 type BlockFilter = 'ACTIVE' | 'ALL';
 
 export const CourtsConfigScreen = () => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const { width } = useWindowDimensions();
     const twoColumns = width >= 760;
     const [courts, setCourts] = useState<Court[]>([]);
@@ -271,7 +274,7 @@ export const CourtsConfigScreen = () => {
     if (loading) {
         return (
             <View style={styles.center}>
-                <ActivityIndicator color={courtsColors.indigo} />
+                <ActivityIndicator color={colors.indigo} />
             </View>
         );
     }
@@ -286,7 +289,7 @@ export const CourtsConfigScreen = () => {
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={() => void load(true)}
-                        tintColor={courtsColors.indigo}
+                        tintColor={colors.indigo}
                     />
                 )}
             >
@@ -579,7 +582,7 @@ export const CourtsConfigScreen = () => {
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     flex: {
         flex: 1,
     },
@@ -587,16 +590,14 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: courtsColors.background,
     },
     container: {
         flex: 1,
-        backgroundColor: courtsColors.background,
     },
     content: {
-        padding: rem(courtsSpacing.lg),
+        padding: rem(2),
         gap: rem(courtsSpacing.lg),
-        paddingBottom: rem(40),
+        paddingBottom: rem(24),
     },
     cardsGrid: {
         flexDirection: 'row',
@@ -607,7 +608,7 @@ const styles = StyleSheet.create({
     mutedText: {
         fontFamily: courtsFonts.medium,
         fontSize: rem(courtsTypography.caption),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
         paddingVertical: rem(10),
     },
     definitionList: {
@@ -620,9 +621,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         gap: rem(8),
         borderWidth: 1,
-        borderColor: '#F1EDE5',
+        borderColor: colors.surfaceRaised,
         borderRadius: rem(courtsRadii.md),
-        backgroundColor: courtsColors.surfaceLow,
+        backgroundColor: colors.surfaceLow,
         paddingHorizontal: rem(12),
         paddingVertical: rem(10),
     },
@@ -636,13 +637,13 @@ const styles = StyleSheet.create({
     definitionTitle: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(12),
-        color: courtsColors.text,
+        color: colors.text,
     },
     definitionMeta: {
         marginTop: rem(2),
         fontFamily: courtsFonts.semibold,
         fontSize: rem(9),
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
     },
     definitionActions: {
         flexDirection: 'row',
@@ -656,24 +657,24 @@ const styles = StyleSheet.create({
     },
     courtChip: {
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         borderRadius: rem(courtsRadii.pill),
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surface,
         paddingHorizontal: rem(12),
         paddingVertical: rem(8),
         maxWidth: rem(160),
     },
     courtChipActive: {
-        backgroundColor: courtsColors.indigo,
-        borderColor: courtsColors.indigo,
+        backgroundColor: colors.indigo,
+        borderColor: colors.indigo,
     },
     courtChipText: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(10),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     courtChipTextActive: {
-        color: courtsColors.white,
+        color: colors.white,
     },
     blockList: {
         gap: rem(8),
@@ -685,9 +686,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         gap: rem(8),
         borderWidth: 1,
-        borderColor: '#F1EDE5',
+        borderColor: colors.surfaceRaised,
         borderRadius: rem(courtsRadii.md),
-        backgroundColor: courtsColors.surfaceLow,
+        backgroundColor: colors.surfaceLow,
         paddingHorizontal: rem(12),
         paddingVertical: rem(10),
     },
@@ -698,13 +699,13 @@ const styles = StyleSheet.create({
     blockTitle: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(12),
-        color: courtsColors.text,
+        color: colors.text,
     },
     blockMeta: {
         marginTop: rem(2),
         fontFamily: courtsFonts.medium,
         fontSize: rem(9),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     settingsActions: {
         flexDirection: 'row',
@@ -713,7 +714,7 @@ const styles = StyleSheet.create({
     },
     effectiveUrl: {
         borderRadius: rem(courtsRadii.md),
-        backgroundColor: courtsColors.surfaceLow,
+        backgroundColor: colors.surfaceLow,
         paddingHorizontal: rem(14),
         paddingVertical: rem(12),
     },
@@ -721,18 +722,18 @@ const styles = StyleSheet.create({
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(8),
         letterSpacing: 1,
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
     },
     effectiveValue: {
         marginTop: rem(2),
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(14),
-        color: courtsColors.text,
+        color: colors.text,
     },
     effectiveExample: {
         marginTop: rem(1),
         fontFamily: courtsFonts.medium,
         fontSize: rem(10),
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
     },
 });

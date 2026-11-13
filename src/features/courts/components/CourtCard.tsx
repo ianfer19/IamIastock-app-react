@@ -4,7 +4,15 @@ import { Pause, Pencil, RotateCcw } from 'lucide-react-native';
 import { rem } from '@/core/utils/responsive';
 import { Court } from '../types/courts.types';
 import { formatMoneyNoDecimals, statusLabel, surfaceLabel } from '../utils/formatters';
-import { courtStatusTone, courtsColors, courtsFonts, courtsRadii, courtsShadow, courtsTypography } from '../theme/courtsTheme';
+import {
+    CourtsPalette,
+    courtStatusTone,
+    courtsFonts,
+    courtsRadii,
+    courtsShadow,
+    courtsTypography,
+    useCourtsColors,
+} from '../theme/courtsTheme';
 import { StatusPill } from './CourtsUI';
 
 export const CourtCard = ({
@@ -20,6 +28,8 @@ export const CourtCard = ({
     onReactivate: () => void;
     style?: ViewStyle;
 }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const cover = court.images?.find(Boolean);
     const tone = courtStatusTone(court.status);
 
@@ -35,7 +45,7 @@ export const CourtCard = ({
                                 key={index}
                                 style={[
                                     styles.placeholderStripe,
-                                    { backgroundColor: index % 2 === 0 ? courtsColors.green : courtsColors.greenMid },
+                                    { backgroundColor: index % 2 === 0 ? colors.green : colors.greenPanel },
                                 ]}
                             />
                         ))}
@@ -67,7 +77,7 @@ export const CourtCard = ({
                     style={({ pressed }) => [styles.actionButton, pressed && styles.pressed]}
                     accessibilityRole="button"
                 >
-                    <Pencil size={rem(12)} color={courtsColors.text} strokeWidth={2.2} />
+                    <Pencil size={rem(12)} color={colors.text} strokeWidth={2.2} />
                     <Text style={styles.actionText}>Editar</Text>
                 </Pressable>
 
@@ -77,7 +87,7 @@ export const CourtCard = ({
                         style={({ pressed }) => [styles.actionButton, pressed && styles.pressed]}
                         accessibilityRole="button"
                     >
-                        <RotateCcw size={rem(12)} color={courtsColors.greenMid} strokeWidth={2.2} />
+                        <RotateCcw size={rem(12)} color={colors.greenMid} strokeWidth={2.2} />
                         <Text style={[styles.actionText, styles.reactivateText]}>Reactivar</Text>
                     </Pressable>
                 ) : (
@@ -86,7 +96,7 @@ export const CourtCard = ({
                         style={({ pressed }) => [styles.actionButton, styles.dangerButton, pressed && styles.pressed]}
                         accessibilityRole="button"
                     >
-                        <Pause size={rem(12)} color={courtsColors.dangerDark} strokeWidth={2.2} />
+                        <Pause size={rem(12)} color={colors.dangerDark} strokeWidth={2.2} />
                         <Text style={[styles.actionText, styles.dangerText]}>Desactivar</Text>
                     </Pressable>
                 )}
@@ -95,12 +105,12 @@ export const CourtCard = ({
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     card: {
-        backgroundColor: courtsColors.surfaceLow,
+        backgroundColor: colors.surfaceLow,
         borderRadius: rem(courtsRadii.xxl),
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         overflow: 'hidden',
         ...courtsShadow.card,
     },
@@ -109,7 +119,7 @@ const styles = StyleSheet.create({
     },
     media: {
         aspectRatio: 16 / 9,
-        backgroundColor: '#E9E4DA',
+        backgroundColor: colors.borderSoft,
         overflow: 'hidden',
     },
     image: {
@@ -146,13 +156,13 @@ const styles = StyleSheet.create({
     name: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(courtsTypography.cardTitle),
-        color: courtsColors.text,
+        color: colors.text,
     },
     meta: {
         marginTop: rem(2),
         fontFamily: courtsFonts.semibold,
         fontSize: rem(courtsTypography.nano),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     priceWrap: {
         alignItems: 'flex-end',
@@ -160,12 +170,12 @@ const styles = StyleSheet.create({
     price: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(15),
-        color: courtsColors.green,
+        color: colors.green,
     },
     priceLabel: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(8),
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
     },
     actions: {
         flexDirection: 'row',
@@ -180,26 +190,26 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: rem(5),
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         borderRadius: rem(courtsRadii.pill),
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surface,
         paddingVertical: rem(8),
         minHeight: rem(40),
     },
     dangerButton: {
-        borderColor: courtsColors.dangerBorder,
-        backgroundColor: courtsColors.dangerSoft,
+        borderColor: colors.dangerBorder,
+        backgroundColor: colors.dangerSoft,
     },
     actionText: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(10),
-        color: courtsColors.text,
+        color: colors.text,
     },
     dangerText: {
-        color: courtsColors.dangerDark,
+        color: colors.dangerDark,
     },
     reactivateText: {
-        color: courtsColors.greenMid,
+        color: colors.greenMid,
     },
     pressed: {
         opacity: 0.75,

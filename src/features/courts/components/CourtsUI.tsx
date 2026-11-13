@@ -12,7 +12,15 @@ import {
 } from 'react-native';
 import { LucideIcon } from 'lucide-react-native';
 import { rem } from '@/core/utils/responsive';
-import { courtsColors, courtsFonts, courtsRadii, courtsShadow, courtsSpacing, courtsTypography } from '../theme/courtsTheme';
+import {
+    CourtsPalette,
+    courtsFonts,
+    courtsRadii,
+    courtsShadow,
+    courtsSpacing,
+    courtsTypography,
+    useCourtsColors,
+} from '../theme/courtsTheme';
 
 export type CourtsFilterValue = 'ACTIVE' | 'ALL' | 'INACTIVE';
 
@@ -22,7 +30,11 @@ export const SectionCard = ({
 }: {
     children: React.ReactNode;
     style?: ViewStyle;
-}) => <View style={[ui.sectionCard, style]}>{children}</View>;
+}) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    return <View style={[styles.sectionCard, style]}>{children}</View>;
+};
 
 export const SectionHeader = ({
     title,
@@ -32,15 +44,19 @@ export const SectionHeader = ({
     title: string;
     subtitle?: string;
     right?: React.ReactNode;
-}) => (
-    <View style={ui.sectionHeader}>
-        <View style={ui.sectionHeaderCopy}>
-            <Text style={ui.sectionTitle}>{title}</Text>
-            {subtitle ? <Text style={ui.sectionSubtitle}>{subtitle}</Text> : null}
+}) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    return (
+        <View style={styles.sectionHeader}>
+            <View style={styles.sectionHeaderCopy}>
+                <Text style={styles.sectionTitle}>{title}</Text>
+                {subtitle ? <Text style={styles.sectionSubtitle}>{subtitle}</Text> : null}
+            </View>
+            {right}
         </View>
-        {right}
-    </View>
-);
+    );
+};
 
 export const CourtsFilterTabs = <T extends string,>({
     options,
@@ -50,24 +66,28 @@ export const CourtsFilterTabs = <T extends string,>({
     options: { value: T; label: string }[];
     value: T;
     onChange: (value: T) => void;
-}) => (
-    <View style={ui.filterTabs}>
-        {options.map(option => {
-            const active = option.value === value;
-            return (
-                <Pressable
-                    key={option.value}
-                    onPress={() => onChange(option.value)}
-                    style={[ui.filterTab, active && ui.filterTabActive]}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: active }}
-                >
-                    <Text style={[ui.filterTabText, active && ui.filterTabTextActive]}>{option.label}</Text>
-                </Pressable>
-            );
-        })}
-    </View>
-);
+}) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    return (
+        <View style={styles.filterTabs}>
+            {options.map(option => {
+                const active = option.value === value;
+                return (
+                    <Pressable
+                        key={option.value}
+                        onPress={() => onChange(option.value)}
+                        style={[styles.filterTab, active && styles.filterTabActive]}
+                        accessibilityRole="button"
+                        accessibilityState={{ selected: active }}
+                    >
+                        <Text style={[styles.filterTabText, active && styles.filterTabTextActive]}>{option.label}</Text>
+                    </Pressable>
+                );
+            })}
+        </View>
+    );
+};
 
 export const StatusPill = ({
     label,
@@ -75,20 +95,28 @@ export const StatusPill = ({
 }: {
     label: string;
     tone?: 'active' | 'maintenance' | 'inactive';
-}) => (
-    <View style={[ui.statusPill, tone === 'maintenance' && ui.statusPillWarning, tone === 'inactive' && ui.statusPillOff]}>
-        <Text style={[ui.statusText, tone === 'maintenance' && ui.statusTextWarning, tone === 'inactive' && ui.statusTextOff]}>
-            {label}
-        </Text>
-    </View>
-);
+}) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    return (
+        <View style={[styles.statusPill, tone === 'maintenance' && styles.statusPillWarning, tone === 'inactive' && styles.statusPillOff]}>
+            <Text style={[styles.statusText, tone === 'maintenance' && styles.statusTextWarning, tone === 'inactive' && styles.statusTextOff]}>
+                {label}
+            </Text>
+        </View>
+    );
+};
 
-export const TagPill = ({ label, icon: Icon }: { label: string; icon?: LucideIcon }) => (
-    <View style={ui.tagPill}>
-        {Icon ? <Icon size={rem(9)} color={courtsColors.indigoDark} strokeWidth={2.4} /> : null}
-        <Text style={ui.tagText}>{label}</Text>
-    </View>
-);
+export const TagPill = ({ label, icon: Icon }: { label: string; icon?: LucideIcon }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    return (
+        <View style={styles.tagPill}>
+            {Icon ? <Icon size={rem(9)} color={colors.indigoDark} strokeWidth={2.4} /> : null}
+            <Text style={styles.tagText}>{label}</Text>
+        </View>
+    );
+};
 
 export const EmptyState = ({
     icon: Icon,
@@ -102,27 +130,35 @@ export const EmptyState = ({
     message: string;
     actionLabel?: string;
     onAction?: () => void;
-}) => (
-    <View style={ui.emptyState}>
-        <View style={ui.emptyIcon}>
-            <Icon size={rem(26)} color={courtsColors.indigo} strokeWidth={1.8} />
+}) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    return (
+        <View style={styles.emptyState}>
+            <View style={styles.emptyIcon}>
+                <Icon size={rem(26)} color={colors.indigo} strokeWidth={1.8} />
+            </View>
+            <Text style={styles.emptyTitle}>{title}</Text>
+            <Text style={styles.emptyMessage}>{message}</Text>
+            {actionLabel && onAction ? (
+                <Pressable onPress={onAction} style={styles.primaryButton} accessibilityRole="button">
+                    <Text style={styles.primaryButtonText}>{actionLabel}</Text>
+                </Pressable>
+            ) : null}
         </View>
-        <Text style={ui.emptyTitle}>{title}</Text>
-        <Text style={ui.emptyMessage}>{message}</Text>
-        {actionLabel && onAction ? (
-            <Pressable onPress={onAction} style={ui.primaryButton} accessibilityRole="button">
-                <Text style={ui.primaryButtonText}>{actionLabel}</Text>
-            </Pressable>
-        ) : null}
-    </View>
-);
+    );
+};
 
-export const LoadingState = ({ label = 'Cargando…' }: { label?: string }) => (
-    <View style={ui.loadingState}>
-        <ActivityIndicator color={courtsColors.indigo} />
-        <Text style={ui.loadingText}>{label}</Text>
-    </View>
-);
+export const LoadingState = ({ label = 'Cargando…' }: { label?: string }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    return (
+        <View style={styles.loadingState}>
+            <ActivityIndicator color={colors.indigo} />
+            <Text style={styles.loadingText}>{label}</Text>
+        </View>
+    );
+};
 
 export const PrimaryButton = ({
     label,
@@ -140,38 +176,42 @@ export const PrimaryButton = ({
     variant?: 'primary' | 'ghost' | 'danger';
     compact?: boolean;
     style?: ViewStyle;
-}) => (
-    <Pressable
-        onPress={onPress}
-        disabled={disabled}
-        accessibilityRole="button"
-        accessibilityState={{ disabled: !!disabled }}
-        style={({ pressed }) => [
-            ui.primaryButton,
-            compact && ui.primaryButtonCompact,
-            variant === 'ghost' && ui.ghostButton,
-            variant === 'danger' && ui.dangerButton,
-            disabled && ui.buttonDisabled,
-            pressed && ui.buttonPressed,
-            style,
-        ]}
-    >
-        {Icon ? (
-            <Icon
-                size={rem(compact ? 12 : 13)}
-                color={variant === 'ghost' ? courtsColors.text : courtsColors.white}
-                strokeWidth={2.3}
-            />
-        ) : null}
-        <Text style={[
-            ui.primaryButtonText,
-            variant === 'ghost' && ui.ghostButtonText,
-            variant === 'danger' && ui.dangerButtonText,
-        ]}>
-            {label}
-        </Text>
-    </Pressable>
-);
+}) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    return (
+        <Pressable
+            onPress={onPress}
+            disabled={disabled}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !!disabled }}
+            style={({ pressed }) => [
+                styles.primaryButton,
+                compact && styles.primaryButtonCompact,
+                variant === 'ghost' && styles.ghostButton,
+                variant === 'danger' && styles.dangerButton,
+                disabled && styles.buttonDisabled,
+                pressed && styles.buttonPressed,
+                style,
+            ]}
+        >
+            {Icon ? (
+                <Icon
+                    size={rem(compact ? 12 : 13)}
+                    color={variant === 'ghost' ? colors.text : colors.white}
+                    strokeWidth={2.3}
+                />
+            ) : null}
+            <Text style={[
+                styles.primaryButtonText,
+                variant === 'ghost' && styles.ghostButtonText,
+                variant === 'danger' && styles.dangerButtonText,
+            ]}>
+                {label}
+            </Text>
+        </Pressable>
+    );
+};
 
 export const IconButton = ({
     icon: Icon,
@@ -183,21 +223,25 @@ export const IconButton = ({
     onPress: () => void;
     variant?: 'default' | 'danger';
     label: string;
-}) => (
-    <Pressable
-        onPress={onPress}
-        accessibilityRole="button"
-        accessibilityLabel={label}
-        hitSlop={8}
-        style={({ pressed }) => [
-            ui.iconButton,
-            variant === 'danger' && ui.iconButtonDanger,
-            pressed && ui.buttonPressed,
-        ]}
-    >
-        <Icon size={rem(13)} color={variant === 'danger' ? courtsColors.dangerDark : courtsColors.textMuted} strokeWidth={2.2} />
-    </Pressable>
-);
+}) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    return (
+        <Pressable
+            onPress={onPress}
+            accessibilityRole="button"
+            accessibilityLabel={label}
+            hitSlop={8}
+            style={({ pressed }) => [
+                styles.iconButton,
+                variant === 'danger' && styles.iconButtonDanger,
+                pressed && styles.buttonPressed,
+            ]}
+        >
+            <Icon size={rem(13)} color={variant === 'danger' ? colors.dangerDark : colors.textMuted} strokeWidth={2.2} />
+        </Pressable>
+    );
+};
 
 export const Field = ({
     label,
@@ -211,13 +255,17 @@ export const Field = ({
     error?: string;
     children: React.ReactNode;
     containerStyle?: ViewStyle;
-}) => (
-    <View style={[ui.field, containerStyle]}>
-        <Text style={ui.fieldLabel}>{label}</Text>
-        {children}
-        {error ? <Text style={ui.fieldError}>{error}</Text> : hint ? <Text style={ui.fieldHint}>{hint}</Text> : null}
-    </View>
-);
+}) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    return (
+        <View style={[styles.field, containerStyle]}>
+            <Text style={styles.fieldLabel}>{label}</Text>
+            {children}
+            {error ? <Text style={styles.fieldError}>{error}</Text> : hint ? <Text style={styles.fieldHint}>{hint}</Text> : null}
+        </View>
+    );
+};
 
 export const TextField = ({
     label,
@@ -233,6 +281,8 @@ export const TextField = ({
     style?: ViewStyle;
     containerStyle?: ViewStyle;
 }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const [focused, setFocused] = useState(false);
     return (
         <Field label={label} hint={hint} error={error} containerStyle={containerStyle}>
@@ -246,11 +296,11 @@ export const TextField = ({
                     setFocused(false);
                     props.onBlur?.(event);
                 }}
-                placeholderTextColor={courtsColors.textSoft}
+                placeholderTextColor={colors.textSoft}
                 style={[
-                    ui.input,
-                    focused && ui.inputFocused,
-                    props.multiline && ui.inputMultiline,
+                    styles.input,
+                    focused && styles.inputFocused,
+                    props.multiline && styles.inputMultiline,
                     style as object,
                 ]}
             />
@@ -266,17 +316,21 @@ export const SwitchRow = ({
     label: string;
     value: boolean;
     onValueChange: (value: boolean) => void;
-}) => (
-    <View style={ui.switchRow}>
-        <Text style={ui.switchLabel}>{label}</Text>
-        <Switch
-            value={value}
-            onValueChange={onValueChange}
-            trackColor={{ false: courtsColors.border, true: courtsColors.indigo }}
-            thumbColor={courtsColors.white}
-        />
-    </View>
-);
+}) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    return (
+        <View style={styles.switchRow}>
+            <Text style={styles.switchLabel}>{label}</Text>
+            <Switch
+                value={value}
+                onValueChange={onValueChange}
+                trackColor={{ false: colors.border, true: colors.indigo }}
+                thumbColor={colors.white}
+            />
+        </View>
+    );
+};
 
 export const DayChips = ({
     value,
@@ -285,9 +339,11 @@ export const DayChips = ({
     value: number[];
     onChange: (value: number[]) => void;
 }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
     return (
-        <View style={ui.dayChips}>
+        <View style={styles.dayChips}>
             {days.map((day, index) => {
                 const active = value.includes(index);
                 return (
@@ -296,11 +352,11 @@ export const DayChips = ({
                         onPress={() => onChange(
                             active ? value.filter(item => item !== index) : [...value, index].sort((a, b) => a - b)
                         )}
-                        style={[ui.dayChip, active && ui.dayChipActive]}
+                        style={[styles.dayChip, active && styles.dayChipActive]}
                         accessibilityRole="button"
                         accessibilityState={{ selected: active }}
                     >
-                        <Text style={[ui.dayChipText, active && ui.dayChipTextActive]}>{day}</Text>
+                        <Text style={[styles.dayChipText, active && styles.dayChipTextActive]}>{day}</Text>
                     </Pressable>
                 );
             })}
@@ -318,31 +374,37 @@ export const OptionChips = <T extends string,>({
     value: T;
     onChange: (value: T) => void;
     label?: string;
-}) => (
-    <View style={ui.field}>
-        {label ? <Text style={ui.fieldLabel}>{label}</Text> : null}
-        <View style={ui.optionChips}>
-            {options.map(option => {
-                const active = option.value === value;
-                return (
-                    <Pressable
-                        key={option.value}
-                        onPress={() => onChange(option.value)}
-                        style={[ui.optionChip, active && ui.optionChipActive]}
-                        accessibilityRole="button"
-                        accessibilityState={{ selected: active }}
-                    >
-                        <Text style={[ui.optionChipText, active && ui.optionChipTextActive]}>{option.label}</Text>
-                    </Pressable>
-                );
-            })}
+}) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    return (
+        <View style={styles.field}>
+            {label ? <Text style={styles.fieldLabel}>{label}</Text> : null}
+            <View style={styles.optionChips}>
+                {options.map(option => {
+                    const active = option.value === value;
+                    return (
+                        <Pressable
+                            key={option.value}
+                            onPress={() => onChange(option.value)}
+                            style={[styles.optionChip, active && styles.optionChipActive]}
+                            accessibilityRole="button"
+                            accessibilityState={{ selected: active }}
+                        >
+                            <Text style={[styles.optionChipText, active && styles.optionChipTextActive]}>{option.label}</Text>
+                        </Pressable>
+                    );
+                })}
+            </View>
         </View>
-    </View>
-);
+    );
+};
 
-const ui = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     sectionCard: {
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surfaceLow,
+        borderWidth: 1,
+        borderColor: colors.border,
         borderRadius: rem(courtsRadii.card),
         padding: rem(courtsSpacing.xxl),
         ...courtsShadow.card,
@@ -361,13 +423,13 @@ const ui = StyleSheet.create({
     sectionTitle: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(courtsTypography.section - 2),
-        color: courtsColors.text,
+        color: colors.text,
     },
     sectionSubtitle: {
         marginTop: rem(2),
         fontFamily: courtsFonts.semibold,
         fontSize: rem(courtsTypography.micro),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     filterTabs: {
         flexDirection: 'row',
@@ -375,7 +437,7 @@ const ui = StyleSheet.create({
         gap: rem(4),
         padding: rem(4),
         borderRadius: rem(courtsRadii.md),
-        backgroundColor: courtsColors.surfaceLow,
+        backgroundColor: colors.surfaceLow,
     },
     filterTab: {
         borderRadius: rem(courtsRadii.xs),
@@ -383,41 +445,41 @@ const ui = StyleSheet.create({
         paddingVertical: rem(6),
     },
     filterTabActive: {
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surface,
         ...courtsShadow.soft,
     },
     filterTabText: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(courtsTypography.caption),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     filterTabTextActive: {
-        color: courtsColors.text,
+        color: colors.text,
     },
     statusPill: {
         alignSelf: 'flex-start',
         borderRadius: rem(courtsRadii.pill),
-        backgroundColor: courtsColors.greenSoft,
+        backgroundColor: colors.greenSoft,
         paddingHorizontal: rem(8),
         paddingVertical: rem(3),
     },
     statusPillWarning: {
-        backgroundColor: courtsColors.amber,
+        backgroundColor: colors.amber,
     },
     statusPillOff: {
-        backgroundColor: '#F3F4F6',
+        backgroundColor: colors.slateSoft,
     },
     statusText: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(courtsTypography.nano),
-        color: courtsColors.greenMid,
+        color: colors.greenMid,
         letterSpacing: 0.3,
     },
     statusTextWarning: {
-        color: courtsColors.amberText,
+        color: colors.amberText,
     },
     statusTextOff: {
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
     },
     tagPill: {
         flexDirection: 'row',
@@ -425,14 +487,14 @@ const ui = StyleSheet.create({
         gap: rem(4),
         alignSelf: 'flex-start',
         borderRadius: rem(courtsRadii.pill),
-        backgroundColor: courtsColors.indigoSoft,
+        backgroundColor: colors.indigoSoft,
         paddingHorizontal: rem(7),
         paddingVertical: rem(3),
     },
     tagText: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(courtsTypography.nano),
-        color: courtsColors.indigoDark,
+        color: colors.indigoDark,
     },
     emptyState: {
         alignItems: 'center',
@@ -444,7 +506,7 @@ const ui = StyleSheet.create({
         width: rem(52),
         height: rem(52),
         borderRadius: rem(26),
-        backgroundColor: courtsColors.indigoSoft,
+        backgroundColor: colors.indigoSoft,
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: rem(10),
@@ -452,14 +514,14 @@ const ui = StyleSheet.create({
     emptyTitle: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(14),
-        color: courtsColors.text,
+        color: colors.text,
         textAlign: 'center',
     },
     emptyMessage: {
         marginTop: rem(4),
         fontFamily: courtsFonts.medium,
         fontSize: rem(courtsTypography.caption),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
         textAlign: 'center',
         lineHeight: rem(16),
     },
@@ -473,7 +535,7 @@ const ui = StyleSheet.create({
     loadingText: {
         fontFamily: courtsFonts.semibold,
         fontSize: rem(courtsTypography.caption),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     primaryButton: {
         flexDirection: 'row',
@@ -481,7 +543,7 @@ const ui = StyleSheet.create({
         justifyContent: 'center',
         gap: rem(6),
         borderRadius: rem(courtsRadii.pill),
-        backgroundColor: courtsColors.indigoDark,
+        backgroundColor: colors.indigoDark,
         paddingHorizontal: rem(18),
         paddingVertical: rem(11),
         minHeight: rem(44),
@@ -495,25 +557,25 @@ const ui = StyleSheet.create({
     primaryButtonText: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(courtsTypography.bodySmall),
-        color: courtsColors.white,
+        color: colors.white,
     },
     ghostButton: {
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surface,
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         ...courtsShadow.soft,
     },
     ghostButtonText: {
-        color: courtsColors.text,
+        color: colors.text,
     },
     dangerButton: {
-        backgroundColor: courtsColors.dangerSoft,
+        backgroundColor: colors.dangerSoft,
         borderWidth: 1,
-        borderColor: courtsColors.dangerBorder,
+        borderColor: colors.dangerBorder,
         ...courtsShadow.soft,
     },
     dangerButtonText: {
-        color: courtsColors.dangerDark,
+        color: colors.dangerDark,
     },
     buttonDisabled: {
         opacity: 0.5,
@@ -527,14 +589,14 @@ const ui = StyleSheet.create({
         height: rem(32),
         borderRadius: rem(courtsRadii.xs),
         borderWidth: 1,
-        borderColor: courtsColors.border,
-        backgroundColor: courtsColors.surface,
+        borderColor: colors.border,
+        backgroundColor: colors.surface,
         alignItems: 'center',
         justifyContent: 'center',
     },
     iconButtonDanger: {
-        borderColor: courtsColors.dangerBorder,
-        backgroundColor: courtsColors.dangerSoft,
+        borderColor: colors.dangerBorder,
+        backgroundColor: colors.dangerSoft,
     },
     field: {
         gap: rem(5),
@@ -543,7 +605,7 @@ const ui = StyleSheet.create({
     fieldLabel: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(courtsTypography.micro),
-        color: '#4B4B63',
+        color: colors.label,
         letterSpacing: 0.3,
         textTransform: 'uppercase',
     },
@@ -551,18 +613,18 @@ const ui = StyleSheet.create({
         width: '100%',
         minHeight: rem(44),
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         borderRadius: rem(courtsRadii.sm),
-        backgroundColor: courtsColors.background,
+        backgroundColor: colors.background,
         paddingHorizontal: rem(12),
         paddingVertical: rem(10),
         fontFamily: courtsFonts.medium,
         fontSize: rem(courtsTypography.body),
-        color: courtsColors.text,
+        color: colors.text,
     },
     inputFocused: {
-        borderColor: courtsColors.indigoBorder,
-        backgroundColor: courtsColors.surface,
+        borderColor: colors.indigoBorder,
+        backgroundColor: colors.surface,
     },
     inputMultiline: {
         minHeight: rem(78),
@@ -571,13 +633,13 @@ const ui = StyleSheet.create({
     fieldHint: {
         fontFamily: courtsFonts.medium,
         fontSize: rem(courtsTypography.nano),
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
         lineHeight: rem(13),
     },
     fieldError: {
         fontFamily: courtsFonts.semibold,
         fontSize: rem(courtsTypography.nano),
-        color: courtsColors.danger,
+        color: colors.danger,
     },
     switchRow: {
         flexDirection: 'row',
@@ -585,7 +647,7 @@ const ui = StyleSheet.create({
         justifyContent: 'space-between',
         gap: rem(10),
         borderRadius: rem(courtsRadii.sm),
-        backgroundColor: courtsColors.surfaceLow,
+        backgroundColor: colors.surfaceLow,
         paddingHorizontal: rem(12),
         paddingVertical: rem(8),
         minHeight: rem(44),
@@ -594,7 +656,7 @@ const ui = StyleSheet.create({
         flex: 1,
         fontFamily: courtsFonts.bold,
         fontSize: rem(courtsTypography.caption),
-        color: courtsColors.text,
+        color: colors.text,
     },
     dayChips: {
         flexDirection: 'row',
@@ -603,25 +665,25 @@ const ui = StyleSheet.create({
     },
     dayChip: {
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         borderRadius: rem(courtsRadii.pill),
-        backgroundColor: courtsColors.background,
+        backgroundColor: colors.background,
         paddingHorizontal: rem(11),
         paddingVertical: rem(7),
         minWidth: rem(42),
         alignItems: 'center',
     },
     dayChipActive: {
-        backgroundColor: courtsColors.indigo,
-        borderColor: courtsColors.indigo,
+        backgroundColor: colors.indigo,
+        borderColor: colors.indigo,
     },
     dayChipText: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(courtsTypography.micro),
-        color: '#4B4B63',
+        color: colors.label,
     },
     dayChipTextActive: {
-        color: courtsColors.white,
+        color: colors.white,
     },
     optionChips: {
         flexDirection: 'row',
@@ -630,24 +692,24 @@ const ui = StyleSheet.create({
     },
     optionChip: {
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         borderRadius: rem(courtsRadii.pill),
-        backgroundColor: courtsColors.background,
+        backgroundColor: colors.background,
         paddingHorizontal: rem(12),
         paddingVertical: rem(8),
         minHeight: rem(38),
         justifyContent: 'center',
     },
     optionChipActive: {
-        backgroundColor: courtsColors.indigoSoft,
-        borderColor: courtsColors.indigoBorder,
+        backgroundColor: colors.indigoSoft,
+        borderColor: colors.indigoBorder,
     },
     optionChipText: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(courtsTypography.micro),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     optionChipTextActive: {
-        color: courtsColors.indigoDark,
+        color: colors.indigoDark,
     },
 });

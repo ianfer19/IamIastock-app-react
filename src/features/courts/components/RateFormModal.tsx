@@ -5,7 +5,13 @@ import { rem } from '@/core/utils/responsive';
 import { CourtsService } from '../services/courtsService';
 import { Rate } from '../types/courts.types';
 import { courtErrorMessage, roundAmount, timeToMinutes } from '../utils/formatters';
-import { courtsColors, courtsFonts, courtsRadii, courtsTypography } from '../theme/courtsTheme';
+import {
+    CourtsPalette,
+    courtsFonts,
+    courtsRadii,
+    courtsTypography,
+    useCourtsColors,
+} from '../theme/courtsTheme';
 import { CourtsModalShell } from './CourtsModalShell';
 import { DayChips, OptionChips, PrimaryButton, SwitchRow, TextField } from './CourtsUI';
 
@@ -27,6 +33,8 @@ export const RateFormModal = ({
     onClose: () => void;
     onSaved: () => void;
 }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const [name, setName] = useState('');
     const [scope, setScope] = useState<Rate['scope']>('COURT');
     const [price, setPrice] = useState('0');
@@ -149,7 +157,7 @@ export const RateFormModal = ({
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -164,7 +172,7 @@ const styles = StyleSheet.create({
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(courtsTypography.micro),
         letterSpacing: 0.3,
-        color: '#4B4B63',
+        color: colors.label,
         textTransform: 'uppercase',
         marginBottom: rem(6),
     },
@@ -172,16 +180,16 @@ const styles = StyleSheet.create({
         marginTop: rem(5),
         fontFamily: courtsFonts.medium,
         fontSize: rem(courtsTypography.nano),
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
     },
     errorText: {
         fontFamily: courtsFonts.semibold,
         fontSize: rem(courtsTypography.caption),
         lineHeight: rem(16),
-        color: courtsColors.danger,
-        backgroundColor: courtsColors.dangerSoft,
+        color: colors.danger,
+        backgroundColor: colors.dangerSoft,
         borderWidth: 1,
-        borderColor: courtsColors.dangerBorder,
+        borderColor: colors.dangerBorder,
         borderRadius: rem(courtsRadii.sm),
         paddingHorizontal: rem(12),
         paddingVertical: rem(10),

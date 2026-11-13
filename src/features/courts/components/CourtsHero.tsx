@@ -6,11 +6,12 @@ import { LucideIcon } from 'lucide-react-native';
 import Svg, { Circle, Line, Path, Polygon, Rect } from 'react-native-svg';
 import { rem } from '@/core/utils/responsive';
 import {
-    courtsColors,
+    CourtsPalette,
     courtsFonts,
     courtsRadii,
     courtsShadow,
     courtsTypography,
+    useCourtsColors,
 } from '../theme/courtsTheme';
 
 export type CourtHeroTone = 'indigo' | 'green' | 'amber' | 'soft';
@@ -99,6 +100,8 @@ export const CourtsHero = ({
     stats,
     compact = true,
 }: CourtsHeroProps) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const { width } = useWindowDimensions();
     const stacked = width < 720;
     const progressValue = Math.min(100, Math.max(0, Number(progress ?? 0) || 0));
@@ -132,7 +135,7 @@ export const CourtsHero = ({
                                 key={index}
                                 style={[
                                     styles.stripe,
-                                    { backgroundColor: index % 2 === 0 ? courtsColors.green : courtsColors.greenMid },
+                                    { backgroundColor: index % 2 === 0 ? colors.green : colors.greenPanel },
                                 ]}
                             />
                         ))}
@@ -146,7 +149,7 @@ export const CourtsHero = ({
 
                 {!stacked ? (
                     <Svg style={StyleSheet.absoluteFill} viewBox="0 0 100 100" preserveAspectRatio="none">
-                        <Polygon points="100,0 100,100 84,100" fill={courtsColors.background} />
+                        <Polygon points="100,0 100,100 84,100" fill={colors.surface} />
                     </Svg>
                 ) : null}
 
@@ -178,10 +181,10 @@ export const CourtsHero = ({
                                 ? styles.iconSoft
                                 : styles.iconIndigo;
                     const iconColor = tone === 'green'
-                        ? courtsColors.green
+                        ? colors.greenMid
                         : tone === 'amber'
-                            ? '#B45309'
-                            : courtsColors.indigo;
+                            ? colors.amberDeep
+                            : colors.indigo;
                     const Icon = stat.icon;
                     return (
                         <View key={stat.label} style={styles.stat}>
@@ -202,12 +205,14 @@ export const CourtsHero = ({
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     hero: {
         flexDirection: 'row',
         minHeight: rem(112),
         borderRadius: rem(courtsRadii.hero),
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surface,
+        borderWidth: 1,
+        borderColor: colors.border,
         overflow: 'hidden',
         ...courtsShadow.card,
     },
@@ -251,7 +256,7 @@ const styles = StyleSheet.create({
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(8.5),
         letterSpacing: 1.2,
-        color: '#D9F99D',
+        color: colors.limeSoft,
     },
     valueRow: {
         flexDirection: 'row',
@@ -264,7 +269,7 @@ const styles = StyleSheet.create({
         fontSize: rem(courtsTypography.heroValue),
         lineHeight: rem(courtsTypography.heroValue + 4),
         letterSpacing: -1,
-        color: courtsColors.white,
+        color: colors.white,
     },
     bigValueCompact: {
         fontSize: rem(22),
@@ -274,7 +279,7 @@ const styles = StyleSheet.create({
         marginBottom: rem(7),
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(18),
-        color: courtsColors.lime,
+        color: colors.lime,
     },
     suffixCompact: {
         marginBottom: rem(3),
@@ -298,7 +303,7 @@ const styles = StyleSheet.create({
     progressFill: {
         height: '100%',
         borderRadius: rem(2),
-        backgroundColor: courtsColors.lime,
+        backgroundColor: colors.lime,
     },
     hint: {
         marginTop: rem(3),
@@ -342,10 +347,10 @@ const styles = StyleSheet.create({
         height: rem(28),
         borderRadius: rem(9),
     },
-    iconIndigo: { backgroundColor: '#E4E6FF' },
-    iconGreen: { backgroundColor: '#DCFCE7' },
-    iconAmber: { backgroundColor: courtsColors.amber },
-    iconSoft: { backgroundColor: courtsColors.indigoSoft },
+    iconIndigo: { backgroundColor: colors.indigoMuted },
+    iconGreen: { backgroundColor: colors.greenSoft },
+    iconAmber: { backgroundColor: colors.amber },
+    iconSoft: { backgroundColor: colors.indigoSoft },
     statCopy: {
         flexShrink: 1,
     },
@@ -353,13 +358,13 @@ const styles = StyleSheet.create({
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(8),
         letterSpacing: 0.4,
-        color: '#4B4B63',
+        color: colors.label,
     },
     statValue: {
         marginTop: rem(1),
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(courtsTypography.heroStat),
-        color: courtsColors.text,
+        color: colors.text,
     },
     statValueCompact: {
         marginTop: 0,

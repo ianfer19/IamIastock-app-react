@@ -5,7 +5,13 @@ import { rem } from '@/core/utils/responsive';
 import { CourtsService } from '../services/courtsService';
 import { Promotion } from '../types/courts.types';
 import { courtErrorMessage, dayLabel } from '../utils/formatters';
-import { courtsColors, courtsFonts, courtsRadii, courtsTypography } from '../theme/courtsTheme';
+import {
+    CourtsPalette,
+    courtsFonts,
+    courtsRadii,
+    courtsTypography,
+    useCourtsColors,
+} from '../theme/courtsTheme';
 import { CourtsModalShell } from './CourtsModalShell';
 import { OptionChips, PrimaryButton, TextField } from './CourtsUI';
 
@@ -25,6 +31,8 @@ export const PromotionExceptionsModal = ({
     onClose: () => void;
     onChanged: () => void;
 }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const [current, setCurrent] = useState<Promotion | null>(promotion);
     const [date, setDate] = useState('');
     const [week, setWeek] = useState('');
@@ -126,27 +134,31 @@ export const PromotionExceptionsModal = ({
     );
 };
 
-const Chip = ({ label, onRemove }: { label: string; onRemove: () => void }) => (
-    <View style={styles.chip}>
-        <Text style={styles.chipText}>{label}</Text>
-        <Pressable onPress={onRemove} hitSlop={6} accessibilityRole="button" accessibilityLabel={`Eliminar ${label}`}>
-            <X size={rem(10)} color={courtsColors.amberText} />
-        </Pressable>
-    </View>
-);
+const Chip = ({ label, onRemove }: { label: string; onRemove: () => void }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    return (
+        <View style={styles.chip}>
+            <Text style={styles.chipText}>{label}</Text>
+            <Pressable onPress={onRemove} hitSlop={6} accessibilityRole="button" accessibilityLabel={`Eliminar ${label}`}>
+                <X size={rem(10)} color={colors.amberText} />
+            </Pressable>
+        </View>
+    );
+};
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     intro: {
         fontFamily: courtsFonts.medium,
         fontSize: rem(courtsTypography.caption),
         lineHeight: rem(16),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     label: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(courtsTypography.nano),
         letterSpacing: 0.8,
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
         marginBottom: rem(6),
     },
     chips: {
@@ -159,28 +171,28 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: rem(4),
         borderRadius: rem(courtsRadii.pill),
-        backgroundColor: courtsColors.amber,
+        backgroundColor: colors.amber,
         paddingHorizontal: rem(9),
         paddingVertical: rem(5),
     },
     chipText: {
         fontFamily: courtsFonts.bold,
         fontSize: rem(10),
-        color: courtsColors.amberText,
+        color: colors.amberText,
     },
     empty: {
         fontFamily: courtsFonts.medium,
         fontSize: rem(courtsTypography.caption),
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
     },
     errorText: {
         fontFamily: courtsFonts.semibold,
         fontSize: rem(courtsTypography.caption),
         lineHeight: rem(16),
-        color: courtsColors.danger,
-        backgroundColor: courtsColors.dangerSoft,
+        color: colors.danger,
+        backgroundColor: colors.dangerSoft,
         borderWidth: 1,
-        borderColor: courtsColors.dangerBorder,
+        borderColor: colors.dangerBorder,
         borderRadius: rem(courtsRadii.sm),
         paddingHorizontal: rem(12),
         paddingVertical: rem(10),

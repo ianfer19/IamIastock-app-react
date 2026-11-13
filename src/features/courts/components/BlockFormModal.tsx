@@ -5,7 +5,13 @@ import { rem } from '@/core/utils/responsive';
 import { CourtsService } from '../services/courtsService';
 import { CourtBlock } from '../types/courts.types';
 import { courtErrorMessage, isoDate } from '../utils/formatters';
-import { courtsColors, courtsFonts, courtsRadii, courtsTypography } from '../theme/courtsTheme';
+import {
+    CourtsPalette,
+    courtsFonts,
+    courtsRadii,
+    courtsTypography,
+    useCourtsColors,
+} from '../theme/courtsTheme';
 import { CourtsModalShell } from './CourtsModalShell';
 import { OptionChips, PrimaryButton, TextField } from './CourtsUI';
 
@@ -29,6 +35,8 @@ export const BlockFormModal = ({
     onClose: () => void;
     onSaved: () => void;
 }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const [date, setDate] = useState(isoDate());
     const [startTime, setStartTime] = useState('00:00');
     const [endTime, setEndTime] = useState('02:00');
@@ -109,15 +117,15 @@ export const BlockFormModal = ({
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     errorText: {
         fontFamily: courtsFonts.semibold,
         fontSize: rem(courtsTypography.caption),
         lineHeight: rem(16),
-        color: courtsColors.danger,
-        backgroundColor: courtsColors.dangerSoft,
+        color: colors.danger,
+        backgroundColor: colors.dangerSoft,
         borderWidth: 1,
-        borderColor: courtsColors.dangerBorder,
+        borderColor: colors.dangerBorder,
         borderRadius: rem(courtsRadii.sm),
         paddingHorizontal: rem(12),
         paddingVertical: rem(10),

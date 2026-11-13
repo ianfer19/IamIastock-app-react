@@ -5,7 +5,7 @@ import { rem } from '@/core/utils/responsive';
 import { CourtsService } from '../services/courtsService';
 import { CourtBooking } from '../types/courts.types';
 import { courtErrorMessage, formatDateLong, formatMoneyNoDecimals } from '../utils/formatters';
-import { courtsColors, courtsFonts, courtsRadii, courtsTypography } from '../theme/courtsTheme';
+import { CourtsPalette, courtsFonts, courtsRadii, courtsTypography, useCourtsColors } from '../theme/courtsTheme';
 import { CourtsModalShell } from './CourtsModalShell';
 import { CourtsConfirmModal } from './CourtsConfirmModal';
 import { PrimaryButton, StatusPill } from './CourtsUI';
@@ -23,6 +23,8 @@ export const BookingDetailModal = ({
     onClose: () => void;
     onChanged: () => void;
 }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const [action, setAction] = useState<ActionKind>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -170,19 +172,23 @@ export const BookingDetailModal = ({
     );
 };
 
-const PaymentBox = ({ label, value, alert }: { label: string; value: string; alert?: boolean }) => (
-    <View style={styles.paymentBox}>
-        <Text style={styles.paymentLabel}>{label}</Text>
-        <Text style={[styles.paymentValue, alert && styles.paymentAlert]}>{value}</Text>
-    </View>
-);
+const PaymentBox = ({ label, value, alert }: { label: string; value: string; alert?: boolean }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+    return (
+        <View style={styles.paymentBox}>
+            <Text style={styles.paymentLabel}>{label}</Text>
+            <Text style={[styles.paymentValue, alert && styles.paymentAlert]}>{value}</Text>
+        </View>
+    );
+};
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     summary: {
         borderRadius: rem(courtsRadii.md),
-        backgroundColor: courtsColors.background,
+        backgroundColor: colors.background,
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         padding: rem(12),
         gap: rem(8),
     },
@@ -196,14 +202,14 @@ const styles = StyleSheet.create({
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(8),
         letterSpacing: 0.7,
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
     },
     summaryValue: {
         flexShrink: 1,
         textAlign: 'right',
         fontFamily: courtsFonts.bold,
         fontSize: rem(11),
-        color: courtsColors.text,
+        color: colors.text,
     },
     paymentGrid: {
         flexDirection: 'row',
@@ -212,7 +218,7 @@ const styles = StyleSheet.create({
     paymentBox: {
         flex: 1,
         borderRadius: rem(courtsRadii.sm),
-        backgroundColor: courtsColors.surfaceLow,
+        backgroundColor: colors.surfaceLow,
         padding: rem(10),
         alignItems: 'center',
     },
@@ -220,16 +226,16 @@ const styles = StyleSheet.create({
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(7.5),
         letterSpacing: 0.5,
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
     },
     paymentValue: {
         marginTop: rem(3),
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(12),
-        color: courtsColors.text,
+        color: colors.text,
     },
     paymentAlert: {
-        color: courtsColors.dangerDark,
+        color: colors.dangerDark,
     },
     actions: {
         flexDirection: 'row',
@@ -240,17 +246,17 @@ const styles = StyleSheet.create({
         fontFamily: courtsFonts.medium,
         fontSize: rem(9),
         lineHeight: rem(14),
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
         textAlign: 'center',
     },
     errorText: {
         fontFamily: courtsFonts.semibold,
         fontSize: rem(courtsTypography.caption),
         lineHeight: rem(16),
-        color: courtsColors.danger,
-        backgroundColor: courtsColors.dangerSoft,
+        color: colors.danger,
+        backgroundColor: colors.dangerSoft,
         borderWidth: 1,
-        borderColor: courtsColors.dangerBorder,
+        borderColor: colors.dangerBorder,
         borderRadius: rem(courtsRadii.sm),
         paddingHorizontal: rem(12),
         paddingVertical: rem(10),

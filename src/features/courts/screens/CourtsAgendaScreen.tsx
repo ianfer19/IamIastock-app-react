@@ -22,27 +22,25 @@ import {
 import * as Haptics from 'expo-haptics';
 import { rem } from '@/core/utils/responsive';
 import { CourtsService } from '../services/courtsService';
-import { Court, CourtAvailability, CourtBooking, Slot } from '../types/courts.types';
+import { Court, CourtAvailability, CourtBooking } from '../types/courts.types';
 import {
     COURTS_DAYS,
     addDays,
     courtErrorMessage,
     formatDateLong,
     formatDateShort,
-    formatHour,
     formatMoneyCompact,
     formatMoneyNoDecimals,
     isoDate,
     parseDate,
-    timeToMinutes,
 } from '../utils/formatters';
 import {
-    courtsColors,
+    CourtsPalette,
     courtsFonts,
     courtsRadii,
-    courtsShadow,
     courtsSpacing,
     courtsTypography,
+    useCourtsColors,
 } from '../theme/courtsTheme';
 import { CourtsHero, CourtHeroStat } from '../components/CourtsHero';
 import {
@@ -57,6 +55,7 @@ import {
     CourtsAgendaFilters,
     CourtsAgendaViewMode,
 } from '../components/CourtsAgendaFilters';
+import { CourtsAgendaMatrix } from '../components/CourtsAgendaMatrix';
 import { BookingFormModal } from '../components/BookingFormModal';
 import { BookingDetailModal } from '../components/BookingDetailModal';
 
@@ -101,6 +100,9 @@ const shiftDate = (iso: string, mode: CourtsAgendaViewMode, direction: -1 | 1): 
 };
 
 export const CourtsAgendaScreen = () => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
+
     const [courts, setCourts] = useState<Court[]>([]);
     const [grid, setGrid] = useState<CourtAvailability | null>(null);
     const [bookings, setBookings] = useState<CourtBooking[]>([]);
@@ -302,13 +304,6 @@ export const CourtsAgendaScreen = () => {
         });
     }, [selectedDate]);
 
-    const bookingForSlot = (courtId: string, start: string): CourtBooking | undefined =>
-        bookings.find(booking =>
-            booking.court_id === courtId
-            && booking.start_time === start
-            && booking.status !== 'CANCELLED'
-        );
-
     const openNewBooking = (courtId?: string, startTime?: string, date?: string) => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         setBookingPreset({
@@ -338,7 +333,7 @@ export const CourtsAgendaScreen = () => {
     if (loading && !courts.length && !grid && !Object.keys(periodBookings).length) {
         return (
             <View style={styles.center}>
-                <ActivityIndicator color={courtsColors.indigo} />
+                <ActivityIndicator color={colors.indigo} />
             </View>
         );
     }
@@ -353,7 +348,7 @@ export const CourtsAgendaScreen = () => {
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={() => void load(selectedDate, viewMode, true)}
-                        tintColor={courtsColors.indigo}
+                        tintColor={colors.indigo}
                     />
                 )}
             >
@@ -426,16 +421,18 @@ export const CourtsAgendaScreen = () => {
                             })}
                         </ScrollView>
 
-                        <SectionCard>
+                        <SectionCard style={{ padding: rem(12) }}>
                             <View style={styles.sectionHeader}>
                                 <View style={styles.sectionCopy}>
                                     <Text style={styles.sectionTitle}>
                                         {freeOnly ? 'Horarios libres' : 'Grilla del día'}
                                     </Text>
-                                    <Text style={styles.sectionSubtitle}>{formatDateLong(selectedDate)}</Text>
+                                    <Text style={styles.sectionSubtitle}>
+                                        {formatDateLong(selectedDate)} · desliza para ver más horas
+                                    </Text>
                                 </View>
                                 <PrimaryButton
-                                    label="Nueva reserva"
+                                    label="Nueva"
                                     icon={Plus}
                                     compact
                                     onPress={() => openNewBooking()}
@@ -444,11 +441,11 @@ export const CourtsAgendaScreen = () => {
 
                             {!freeOnly ? (
                                 <View style={styles.legend}>
-                                    <LegendItem color={courtsColors.indigo} label="Confirmada" />
-                                    <LegendItem color={courtsColors.greenMid} label="En juego" />
-                                    <LegendItem color={courtsColors.amberBorder} label="Pago pendiente" />
-                                    <LegendItem color="#E7E5E4" label="Mantenimiento" />
-                                    <LegendItem color={courtsColors.indigoSoft} label="Libre" dashed />
+                                    <LegendItem color={colors.indigo} label="Pagada" />
+                                    <LegendItem color={colors.greenPanel} label="En juego" />
+                                    <LegendItem color={colors.amberBorder} label="Pago pendiente" />
+                                    <LegendItem color={colors.neutral} label="Mantenimiento" />
+                                    <LegendItem color={colors.indigoSoft} label="Libre" dashed />
                                 </View>
                             ) : null}
 
@@ -463,50 +460,25 @@ export const CourtsAgendaScreen = () => {
                                         : 'La cancha seleccionada no está disponible en esta fecha.'}
                                 />
                             ) : (
-                                gridRows.map((row, index) => {
-                                    const slots = freeOnly
-                                        ? row.slots.filter(slot => slot.status === 'AVAILABLE')
-                                        : row.slots;
-                                    const freeCount = row.slots.filter(slot => slot.status === 'AVAILABLE').length;
-                                    return (
-                                        <View
-                                            key={row.court_id}
-                                            style={[styles.courtBlock, index > 0 && styles.courtBlockDivider]}
-                                        >
-                                            {gridRows.length > 1 || selectedCourtId === ALL_COURTS ? (
-                                                <View style={styles.courtBlockHead}>
-                                                    <View style={styles.courtBlockCopy}>
-                                                        <Text style={styles.courtBlockName} numberOfLines={1}>{row.name}</Text>
-                                                        <Text style={styles.courtBlockMeta}>
-                                                            {row.football_type} · {freeCount} libres
-                                                        </Text>
-                                                    </View>
-                                                    <StatusPill
-                                                        label={freeCount ? `${freeCount} libres` : 'Sin cupo'}
-                                                        tone={freeCount ? 'active' : 'inactive'}
-                                                    />
-                                                </View>
-                                            ) : null}
-
-                                            {!slots.length ? (
-                                                <Text style={styles.freeEmpty}>Sin horarios libres para esta cancha.</Text>
-                                            ) : (
-                                                <View style={styles.timeline}>
-                                                    {slots.map(slot => (
-                                                        <TimelineSlot
-                                                            key={`${row.court_id}-${slot.start}-${slot.end}`}
-                                                            slot={slot}
-                                                            booking={bookingForSlot(row.court_id, slot.start)}
-                                                            onPressFree={() => openNewBooking(row.court_id, slot.start)}
-                                                            onPressBooking={booking => setSelectedBooking(booking)}
-                                                        />
-                                                    ))}
-                                                </View>
-                                            )}
-                                        </View>
-                                    );
-                                })
+                                <CourtsAgendaMatrix
+                                    rows={gridRows}
+                                    bookings={bookings}
+                                    durationMinutes={grid?.duration_minutes || 60}
+                                    freeOnly={freeOnly}
+                                    onPressFree={(courtId, slot) => openNewBooking(courtId, slot.start)}
+                                    onPressBooking={booking => setSelectedBooking(booking)}
+                                />
                             )}
+
+                            {!loading && gridRows.length ? (
+                                <View style={styles.matrixFooter}>
+                                    <Text style={styles.matrixFooterText}>
+                                        {gridRows.length} {gridRows.length === 1 ? 'cancha' : 'canchas'} ·{' '}
+                                        {gridRows.reduce((total, row) => total + row.slots.filter(slot => slot.status === 'AVAILABLE').length, 0)} horarios libres
+                                    </Text>
+                                    <StatusPill label={`${gridRows.reduce((total, row) => total + row.slots.filter(slot => slot.status === 'TAKEN').length, 0)} reservados`} tone="active" />
+                                </View>
+                            ) : null}
                         </SectionCard>
                     </>
                 ) : null}
@@ -577,7 +549,7 @@ export const CourtsAgendaScreen = () => {
                                                 )}
                                             </View>
 
-                                            <ChevronRight size={rem(14)} color={courtsColors.textMuted} strokeWidth={2.2} />
+                                            <ChevronRight size={rem(14)} color={colors.textMuted} strokeWidth={2.2} />
                                         </Pressable>
                                     );
                                 })}
@@ -646,8 +618,8 @@ export const CourtsAgendaScreen = () => {
                         )}
 
                         <View style={styles.monthLegend}>
-                            <LegendItem color={courtsColors.indigo} label="Con reservas" />
-                            <LegendItem color={courtsColors.amberBorder} label="Saldo pendiente" />
+                            <LegendItem color={colors.indigo} label="Con reservas" />
+                            <LegendItem color={colors.amberBorder} label="Saldo pendiente" />
                         </View>
                     </SectionCard>
                 ) : null}
@@ -673,105 +645,32 @@ export const CourtsAgendaScreen = () => {
     );
 };
 
-const TimelineSlot = ({
-    slot,
-    booking,
-    onPressFree,
-    onPressBooking,
-}: {
-    slot: Slot;
-    booking?: CourtBooking;
-    onPressFree: () => void;
-    onPressBooking: (booking: CourtBooking) => void;
-}) => {
-    if (slot.status === 'AVAILABLE') {
-        return (
-            <View style={styles.slotRow}>
-                <Text style={styles.slotTime}>{formatHour(timeToMinutes(slot.start))}</Text>
-                <Pressable
-                    onPress={onPressFree}
-                    style={({ pressed }) => [styles.slotCard, styles.freeSlot, pressed && styles.pressed]}
-                    accessibilityRole="button"
-                >
-                    <View style={styles.slotCopy}>
-                        <Text style={styles.freeTitle}>Libre</Text>
-                        <Text style={styles.freeMeta}>{slot.start} – {slot.end}</Text>
-                    </View>
-                    {slot.price ? <Text style={styles.freePrice}>{formatMoneyNoDecimals(slot.price)}</Text> : null}
-                    <Plus size={rem(15)} color={courtsColors.indigo} />
-                </Pressable>
-            </View>
-        );
-    }
-
-    if (slot.status === 'TAKEN' && booking) {
-        const paid = booking.payment_status === 'PAID';
-        const inPlay = booking.status === 'CHECKED_IN';
-        return (
-            <View style={styles.slotRow}>
-                <Text style={styles.slotTime}>{formatHour(timeToMinutes(slot.start))}</Text>
-                <Pressable
-                    onPress={() => onPressBooking(booking)}
-                    style={({ pressed }) => [
-                        styles.slotCard,
-                        inPlay ? styles.inPlaySlot : paid ? styles.paidSlot : styles.pendingSlot,
-                        pressed && styles.pressed,
-                    ]}
-                >
-                    <View style={styles.slotCopy}>
-                        <Text style={[styles.bookingTitle, (inPlay || paid) && styles.bookingTitleLight]} numberOfLines={1}>
-                            {booking.customer_name}
-                        </Text>
-                        <Text style={[styles.bookingMeta, (inPlay || paid) && styles.bookingMetaLight]}>
-                            {booking.start_time} – {booking.end_time} · {formatMoneyNoDecimals(booking.total)}
-                        </Text>
-                    </View>
-                    <View style={styles.bookingPills}>
-                        {inPlay ? <StatusPill label="En juego" tone="active" /> : null}
-                        {!inPlay && !paid ? <StatusPill label="Pago pendiente" tone="maintenance" /> : null}
-                    </View>
-                </Pressable>
-            </View>
-        );
-    }
-
-    const blocked = slot.status === 'BLOCKED';
+const LegendItem = ({ color, label, dashed }: { color: string; label: string; dashed?: boolean }) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     return (
-        <View style={styles.slotRow}>
-            <Text style={styles.slotTime}>{formatHour(timeToMinutes(slot.start))}</Text>
-            <View style={[styles.slotCard, styles.closedSlot]}>
-                <View style={styles.slotCopy}>
-                    <Text style={styles.closedTitle}>{blocked ? 'Mantenimiento' : slot.status === 'PAST' ? 'Pasado' : 'No disponible'}</Text>
-                    <Text style={styles.closedMeta}>{slot.start} – {slot.end}</Text>
-                </View>
-            </View>
+        <View style={styles.legendItem}>
+            <View style={[styles.legendDot, { backgroundColor: color }, dashed && styles.legendDashed]} />
+            <Text style={styles.legendText}>{label}</Text>
         </View>
     );
 };
 
-const LegendItem = ({ color, label, dashed }: { color: string; label: string; dashed?: boolean }) => (
-    <View style={styles.legendItem}>
-        <View style={[styles.legendDot, { backgroundColor: color }, dashed && styles.legendDashed]} />
-        <Text style={styles.legendText}>{label}</Text>
-    </View>
-);
-
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     flex: { flex: 1 },
     center: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: courtsColors.background,
     },
     container: {
         flex: 1,
-        backgroundColor: courtsColors.background,
+        backgroundColor: 'transparent',
     },
     content: {
-        padding: rem(courtsSpacing.lg),
+        padding: rem(2),
         gap: rem(courtsSpacing.lg),
-        paddingBottom: rem(40),
+        paddingBottom: rem(28),
     },
     errorBox: {
         flexDirection: 'row',
@@ -780,8 +679,8 @@ const styles = StyleSheet.create({
         gap: rem(10),
         borderRadius: rem(courtsRadii.md),
         borderWidth: 1,
-        borderColor: courtsColors.dangerBorder,
-        backgroundColor: courtsColors.dangerSoft,
+        borderColor: colors.dangerBorder,
+        backgroundColor: colors.dangerSoft,
         paddingHorizontal: rem(12),
         paddingVertical: rem(8),
     },
@@ -789,7 +688,7 @@ const styles = StyleSheet.create({
         flex: 1,
         fontFamily: courtsFonts.semibold,
         fontSize: rem(courtsTypography.caption),
-        color: courtsColors.dangerDark,
+        color: colors.dangerDark,
     },
     dateStrip: {
         gap: rem(8),
@@ -799,34 +698,33 @@ const styles = StyleSheet.create({
         width: rem(52),
         height: rem(64),
         borderRadius: rem(courtsRadii.xl),
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surfaceLow,
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         alignItems: 'center',
         justifyContent: 'center',
         gap: rem(2),
-        ...courtsShadow.soft,
     },
     datePillActive: {
-        backgroundColor: courtsColors.indigo,
-        borderColor: courtsColors.indigo,
+        backgroundColor: colors.indigo,
+        borderColor: colors.indigo,
     },
     dateLabel: {
         fontFamily: courtsFonts.semibold,
         fontSize: rem(10),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
         textTransform: 'capitalize',
     },
     dateLabelActive: {
-        color: '#E4E6FF',
+        color: colors.indigoMuted,
     },
     dateDay: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(18),
-        color: courtsColors.text,
+        color: colors.text,
     },
     dateDayActive: {
-        color: courtsColors.white,
+        color: colors.white,
     },
     sectionHeader: {
         flexDirection: 'row',
@@ -842,20 +740,20 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(17),
-        color: courtsColors.text,
+        color: colors.text,
     },
     sectionSubtitle: {
         marginTop: rem(2),
         fontFamily: courtsFonts.semibold,
         fontSize: rem(10),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
         textTransform: 'capitalize',
     },
     legend: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: rem(10),
-        marginBottom: rem(12),
+        marginBottom: rem(10),
     },
     legendItem: {
         flexDirection: 'row',
@@ -869,146 +767,26 @@ const styles = StyleSheet.create({
     },
     legendDashed: {
         borderWidth: 1,
-        borderColor: courtsColors.indigo,
+        borderColor: colors.indigo,
         borderStyle: 'dashed',
     },
     legendText: {
         fontFamily: courtsFonts.medium,
         fontSize: rem(8),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
-    courtBlock: {
-        gap: rem(6),
-    },
-    courtBlockDivider: {
-        marginTop: rem(12),
-        paddingTop: rem(12),
-        borderTopWidth: 1,
-        borderTopColor: courtsColors.border,
-    },
-    courtBlockHead: {
+    matrixFooter: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: rem(8),
+        marginTop: rem(10),
     },
-    courtBlockCopy: {
+    matrixFooterText: {
         flex: 1,
-        minWidth: 0,
-    },
-    courtBlockName: {
-        fontFamily: courtsFonts.extraBold,
-        fontSize: rem(12),
-        color: courtsColors.text,
-    },
-    courtBlockMeta: {
-        marginTop: rem(1),
-        fontFamily: courtsFonts.semibold,
-        fontSize: rem(8),
-        color: courtsColors.textMuted,
-    },
-    freeEmpty: {
-        fontFamily: courtsFonts.medium,
-        fontSize: rem(9),
-        color: courtsColors.textSoft,
-        paddingVertical: rem(4),
-    },
-    timeline: {
-        gap: rem(6),
-    },
-    slotRow: {
-        flexDirection: 'row',
-        alignItems: 'stretch',
-        gap: rem(8),
-    },
-    slotTime: {
-        width: rem(38),
-        paddingTop: rem(10),
         fontFamily: courtsFonts.semibold,
         fontSize: rem(9),
-        color: courtsColors.textMuted,
-        textAlign: 'right',
-    },
-    slotCard: {
-        flex: 1,
-        minHeight: rem(54),
-        borderRadius: rem(courtsRadii.md),
-        paddingHorizontal: rem(12),
-        paddingVertical: rem(8),
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: rem(8),
-    },
-    slotCopy: {
-        flex: 1,
-        minWidth: 0,
-    },
-    freeSlot: {
-        backgroundColor: courtsColors.indigoSoft,
-        borderWidth: 1,
-        borderColor: courtsColors.indigoBorder,
-        borderStyle: 'dashed',
-    },
-    freeTitle: {
-        fontFamily: courtsFonts.extraBold,
-        fontSize: rem(11),
-        color: courtsColors.indigoDark,
-    },
-    freeMeta: {
-        fontFamily: courtsFonts.medium,
-        fontSize: rem(8),
-        color: '#6366F1',
-    },
-    freePrice: {
-        fontFamily: courtsFonts.extraBold,
-        fontSize: rem(10),
-        color: courtsColors.indigoDark,
-    },
-    paidSlot: {
-        backgroundColor: courtsColors.indigo,
-    },
-    inPlaySlot: {
-        backgroundColor: courtsColors.greenMid,
-    },
-    pendingSlot: {
-        backgroundColor: courtsColors.amber,
-        borderWidth: 1,
-        borderColor: courtsColors.amberBorder,
-    },
-    bookingTitle: {
-        fontFamily: courtsFonts.extraBold,
-        fontSize: rem(11),
-        color: '#78350F',
-    },
-    bookingTitleLight: {
-        color: courtsColors.white,
-    },
-    bookingMeta: {
-        fontFamily: courtsFonts.medium,
-        fontSize: rem(8),
-        color: '#92400E',
-    },
-    bookingMetaLight: {
-        color: 'rgba(255,255,255,0.82)',
-    },
-    bookingPills: {
-        alignItems: 'flex-end',
-        gap: rem(3),
-    },
-    closedSlot: {
-        backgroundColor: '#F5F5F4',
-        borderWidth: 1,
-        borderColor: '#D6D3D1',
-    },
-    closedTitle: {
-        fontFamily: courtsFonts.bold,
-        fontSize: rem(10),
-        color: '#44403C',
-    },
-    closedMeta: {
-        fontFamily: courtsFonts.medium,
-        fontSize: rem(8),
-        color: '#78716C',
+        color: colors.textMuted,
     },
     weekList: {
         gap: rem(8),
@@ -1019,44 +797,44 @@ const styles = StyleSheet.create({
         gap: rem(10),
         borderRadius: rem(courtsRadii.lg),
         borderWidth: 1,
-        borderColor: courtsColors.border,
-        backgroundColor: courtsColors.surfaceMuted,
+        borderColor: colors.border,
+        backgroundColor: colors.surfaceMuted,
         padding: rem(10),
     },
     weekRowToday: {
-        borderColor: courtsColors.indigoBorder,
-        backgroundColor: courtsColors.indigoSoft,
+        borderColor: colors.indigoBorder,
+        backgroundColor: colors.indigoSoft,
     },
     weekDayBadge: {
         width: rem(42),
         height: rem(46),
         borderRadius: rem(courtsRadii.sm),
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surfaceLow,
         borderWidth: 1,
-        borderColor: courtsColors.border,
+        borderColor: colors.border,
         alignItems: 'center',
         justifyContent: 'center',
     },
     weekDayBadgeToday: {
-        backgroundColor: courtsColors.indigo,
-        borderColor: courtsColors.indigo,
+        backgroundColor: colors.indigo,
+        borderColor: colors.indigo,
     },
     weekDayLabel: {
         fontFamily: courtsFonts.semibold,
         fontSize: rem(8),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
         textTransform: 'capitalize',
     },
     weekDayLabelToday: {
-        color: '#E4E6FF',
+        color: colors.indigoMuted,
     },
     weekDayNumber: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(16),
-        color: courtsColors.text,
+        color: colors.text,
     },
     weekDayNumberToday: {
-        color: courtsColors.white,
+        color: colors.white,
     },
     weekCopy: {
         flex: 1,
@@ -1066,36 +844,36 @@ const styles = StyleSheet.create({
     weekCount: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(11),
-        color: courtsColors.text,
+        color: colors.text,
     },
     weekMoney: {
         fontFamily: courtsFonts.semibold,
         fontSize: rem(8),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
     },
     weekBarTrack: {
         marginTop: rem(2),
         height: rem(4),
         borderRadius: rem(2),
-        backgroundColor: courtsColors.surfaceLow,
+        backgroundColor: colors.surfaceRaised,
         overflow: 'hidden',
     },
     weekBarFill: {
         height: '100%',
         borderRadius: rem(2),
-        backgroundColor: courtsColors.greenMid,
+        backgroundColor: colors.greenMid,
     },
     weekSample: {
         marginTop: rem(2),
         fontFamily: courtsFonts.medium,
         fontSize: rem(8),
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
     },
     weekEmpty: {
         marginTop: rem(2),
         fontFamily: courtsFonts.medium,
         fontSize: rem(8),
-        color: courtsColors.textSoft,
+        color: colors.textSoft,
     },
     monthGrid: {
         flexDirection: 'row',
@@ -1107,7 +885,7 @@ const styles = StyleSheet.create({
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(8),
         letterSpacing: 0.4,
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
         textTransform: 'uppercase',
         paddingBottom: rem(4),
     },
@@ -1119,8 +897,8 @@ const styles = StyleSheet.create({
         minHeight: rem(44),
         borderRadius: rem(courtsRadii.xs),
         borderWidth: 1,
-        borderColor: courtsColors.border,
-        backgroundColor: courtsColors.surface,
+        borderColor: colors.border,
+        backgroundColor: colors.surfaceLow,
         padding: rem(4),
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
@@ -1130,19 +908,19 @@ const styles = StyleSheet.create({
         borderColor: 'transparent',
     },
     monthCellToday: {
-        borderColor: courtsColors.indigo,
-        backgroundColor: courtsColors.indigoSoft,
+        borderColor: colors.indigo,
+        backgroundColor: colors.indigoSoft,
     },
     monthDay: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(10),
-        color: courtsColors.text,
+        color: colors.text,
     },
     monthDayOut: {
-        color: courtsColors.borderStrong,
+        color: colors.borderStrong,
     },
     monthDayToday: {
-        color: courtsColors.indigoDark,
+        color: colors.indigoDark,
     },
     monthBadge: {
         position: 'absolute',
@@ -1152,20 +930,20 @@ const styles = StyleSheet.create({
         height: rem(15),
         paddingHorizontal: rem(3),
         borderRadius: rem(8),
-        backgroundColor: courtsColors.greenSoft,
+        backgroundColor: colors.greenSoft,
         alignItems: 'center',
         justifyContent: 'center',
     },
     monthBadgePending: {
-        backgroundColor: courtsColors.amber,
+        backgroundColor: colors.amber,
     },
     monthBadgeText: {
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(8),
-        color: courtsColors.greenMid,
+        color: colors.greenMid,
     },
     monthBadgeTextPending: {
-        color: courtsColors.amberText,
+        color: colors.amberText,
     },
     monthLegend: {
         flexDirection: 'row',

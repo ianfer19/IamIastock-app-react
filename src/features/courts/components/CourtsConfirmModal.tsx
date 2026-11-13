@@ -4,7 +4,7 @@ import { AlertTriangle, CheckCircle2, Info } from 'lucide-react-native';
 import { rem } from '@/core/utils/responsive';
 import { CourtsModalShell } from './CourtsModalShell';
 import { PrimaryButton } from './CourtsUI';
-import { courtsColors, courtsFonts, courtsRadii, courtsTypography } from '../theme/courtsTheme';
+import { CourtsPalette, courtsFonts, courtsRadii, courtsTypography, useCourtsColors } from '../theme/courtsTheme';
 
 interface CourtsConfirmModalProps {
     visible: boolean;
@@ -29,12 +29,14 @@ export const CourtsConfirmModal = ({
     onConfirm,
     onCancel,
 }: CourtsConfirmModalProps) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const Icon = type === 'danger' ? AlertTriangle : type === 'info' ? CheckCircle2 : Info;
     const tone = type === 'danger'
-        ? { bg: courtsColors.dangerSoft, color: courtsColors.dangerDark }
+        ? { bg: colors.dangerSoft, color: colors.dangerDark }
         : type === 'info'
-            ? { bg: courtsColors.indigoSoft, color: courtsColors.indigoDark }
-            : { bg: courtsColors.amber, color: courtsColors.amberText };
+            ? { bg: colors.indigoSoft, color: colors.indigoDark }
+            : { bg: colors.amber, color: colors.amberText };
 
     return (
         <CourtsModalShell
@@ -66,7 +68,7 @@ export const CourtsConfirmModal = ({
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     content: {
         alignItems: 'center',
         gap: rem(12),
@@ -83,7 +85,7 @@ const styles = StyleSheet.create({
         fontFamily: courtsFonts.medium,
         fontSize: rem(courtsTypography.body),
         lineHeight: rem(19),
-        color: courtsColors.textMuted,
+        color: colors.textMuted,
         textAlign: 'center',
     },
 });

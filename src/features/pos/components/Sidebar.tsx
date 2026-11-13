@@ -44,7 +44,7 @@ import { rem } from '@/core/utils/responsive';
 import { useTheme } from '@/core/theme/theme';
 import { SecureStorage } from '@/core/storage/secureStorage';
 import { authEventEmitter } from '@/core/api/client';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useNavigationState } from '@react-navigation/native';
 import { useAppSelector, useAppDispatch } from '@/core/store/store';
 import { Env } from '@/core/config/env';
 import { setSelectedRegister } from '@/core/store/slices/posSlice';
@@ -168,10 +168,11 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
   const navigation = useNavigation<any>();
   const { user } = useAppSelector((state) => state.auth);
 
-  const state = navigation.getState();
-  const activeRoute = state ? state.routes[state.index] : null;
-  const currentRouteName = activeRoute?.name || 'DASHBOARD';
-  const currentTab = activeRoute?.params?.tab || 'HOME';
+  // El tab activo vive en los params de la ruta DASHBOARD; useNavigationState
+  // mantiene el resaltado reactivo aunque el sidebar esté siempre montado.
+  const currentRoute = useNavigationState((state: any) => state?.routes?.[state.index]);
+  const currentRouteName = currentRoute?.name || 'DASHBOARD';
+  const currentTab = (currentRoute?.params as { tab?: string } | undefined)?.tab || 'HOME';
 
   // ── Animations ──────────────────────────────────
   const slideAnim = useRef(new Animated.Value(-SIDEBAR_WIDTH)).current;
@@ -624,9 +625,10 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
             const isActive =
               (item.id === 'INICIO' && currentRouteName === 'DASHBOARD' && currentTab === 'HOME') ||
               (item.id === 'INVENTARIO' && currentRouteName === 'DASHBOARD' && currentTab === 'INVENTARIO') ||
-              (item.id === 'VENTAS' && currentRouteName === 'DASHBOARD' && currentTab !== 'CAJA' && currentTab !== 'INVENTARIO' && currentTab !== 'HOME' && currentTab !== 'CONTROL') ||
+              (item.id === 'VENTAS' && currentRouteName === 'DASHBOARD' && !['CAJA', 'INVENTARIO', 'HOME', 'CONTROL', 'CANCHAS'].includes(currentTab)) ||
               (item.id === 'CAJA' && currentRouteName === 'DASHBOARD' && currentTab === 'CAJA') ||
-              (item.id === 'CONTROL' && currentRouteName === 'DASHBOARD' && currentTab === 'CONTROL');
+              (item.id === 'CONTROL' && currentRouteName === 'DASHBOARD' && currentTab === 'CONTROL') ||
+              (item.id === 'CANCHAS' && currentRouteName === 'DASHBOARD' && currentTab === 'CANCHAS');
 
             return (
               <MenuItem

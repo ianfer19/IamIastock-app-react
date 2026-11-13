@@ -4,7 +4,7 @@ import { LucideIcon } from 'lucide-react-native';
 import { MotiView } from 'moti';
 import * as Haptics from 'expo-haptics';
 import { rem } from '@/core/utils/responsive';
-import { courtsColors, courtsFonts, courtsRadii, courtsShadow } from '../theme/courtsTheme';
+import { CourtsPalette, courtsFonts, courtsRadii, courtsShadow, useCourtsColors } from '../theme/courtsTheme';
 
 export interface CourtsNavItem {
     key: string;
@@ -24,7 +24,10 @@ interface CourtsNavBarProps {
  * Replica el patrón de `PosSubHeader` (Ventas): pastilla de iconos + etiqueta activa.
  */
 export const CourtsNavBar = ({ items, active, onChange }: CourtsNavBarProps) => {
+    const colors = useCourtsColors();
+    const styles = getStyles(colors);
     const activeItem = items.find(item => item.key === active) || items[0];
+    const ActiveIcon = activeItem?.icon;
 
     return (
         <View style={styles.wrapper}>
@@ -55,8 +58,8 @@ export const CourtsNavBar = ({ items, active, onChange }: CourtsNavBarProps) => 
                             <MotiView
                                 animate={{
                                     scale: isActive ? 1.05 : 1,
-                                    backgroundColor: isActive ? courtsColors.indigoSoft : courtsColors.surface,
-                                    borderColor: isActive ? courtsColors.indigoBorder : courtsColors.surface,
+                                    backgroundColor: isActive ? colors.indigoSoft : colors.surface,
+                                    borderColor: isActive ? colors.indigoBorder : colors.surface,
                                 }}
                                 transition={{ type: 'spring', stiffness: 350, damping: 20 }}
                                 style={styles.navItem}
@@ -64,7 +67,7 @@ export const CourtsNavBar = ({ items, active, onChange }: CourtsNavBarProps) => 
                                 <Icon
                                     size={rem(15.5)}
                                     strokeWidth={2.3}
-                                    color={isActive ? courtsColors.indigo : courtsColors.textMuted}
+                                    color={isActive ? colors.indigo : colors.textMuted}
                                 />
                             </MotiView>
                         </Pressable>
@@ -79,10 +82,10 @@ export const CourtsNavBar = ({ items, active, onChange }: CourtsNavBarProps) => 
                 transition={{ type: 'spring', damping: 15, stiffness: 180 }}
                 style={styles.labelPill}
             >
-                {activeItem ? (
+                {activeItem && ActiveIcon ? (
                     <>
                         <View style={styles.iconContainer}>
-                            <activeItem.icon size={rem(11)} color={courtsColors.indigo} strokeWidth={2.4} />
+                            <ActiveIcon size={rem(11)} color={colors.indigo} strokeWidth={2.4} />
                         </View>
                         <Text style={styles.labelText} numberOfLines={1}>{activeItem.shortLabel}</Text>
                     </>
@@ -92,7 +95,7 @@ export const CourtsNavBar = ({ items, active, onChange }: CourtsNavBarProps) => 
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors: CourtsPalette) => StyleSheet.create({
     wrapper: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -105,7 +108,7 @@ const styles = StyleSheet.create({
     navPill: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surface,
         padding: rem(3.5),
         borderRadius: rem(courtsRadii.pill),
         gap: rem(3),
@@ -130,13 +133,13 @@ const styles = StyleSheet.create({
         flexShrink: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: courtsColors.indigoSoft,
+        backgroundColor: colors.indigoSoft,
         paddingLeft: rem(8),
         paddingRight: rem(12),
         paddingVertical: rem(6),
         borderRadius: rem(courtsRadii.pill),
         borderWidth: 1,
-        borderColor: courtsColors.indigoBorder,
+        borderColor: colors.indigoBorder,
         gap: rem(5),
         ...courtsShadow.soft,
     },
@@ -144,7 +147,7 @@ const styles = StyleSheet.create({
         width: rem(20),
         height: rem(20),
         borderRadius: rem(10),
-        backgroundColor: courtsColors.surface,
+        backgroundColor: colors.surface,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -153,6 +156,6 @@ const styles = StyleSheet.create({
         fontFamily: courtsFonts.extraBold,
         fontSize: rem(9.5),
         letterSpacing: 0.8,
-        color: courtsColors.indigo,
+        color: colors.indigo,
     },
 });
