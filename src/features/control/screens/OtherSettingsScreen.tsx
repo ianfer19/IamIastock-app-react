@@ -31,7 +31,7 @@ const colors = {
 export default function OtherSettingsScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
-  const { config, loading } = useAppSelector(state => state.tenant);
+  const { data: config, loading } = useAppSelector(state => state.tenant);
   const { user } = useAppSelector(state => state.auth);
 
   const [activeTab, setActiveTab] = useState<'CAJA' | 'AVANZADO'>('CAJA');

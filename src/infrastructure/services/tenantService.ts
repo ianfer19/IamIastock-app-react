@@ -7,6 +7,7 @@ export interface TenantConfig {
   id: string;
   name: string;
   payload: {
+    cash_control?: Record<string, any>;
     branding?: {
       logo_url?: string;
       primary_color?: string;

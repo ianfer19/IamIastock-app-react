@@ -609,7 +609,6 @@ const getStyles = (colors: any, mode: 'light' | 'dark') => StyleSheet.create({
   bentoRowDivider: {
     height: 1,
     backgroundColor: colors.slate[200],
-    my: rem(6),
     marginVertical: rem(6),
   },
   pillsScrollContainer: {

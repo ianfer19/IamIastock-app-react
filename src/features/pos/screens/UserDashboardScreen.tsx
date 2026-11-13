@@ -28,7 +28,8 @@ import {
   MapPin,
   Clock,
   CirclePlay,
-  Cpu
+  Cpu,
+  Goal
 } from 'lucide-react-native';
 import { MotiView, AnimatePresence } from 'moti';
 import * as Haptics from 'expo-haptics';
@@ -291,6 +292,30 @@ export const UserDashboardScreen = ({ onNavigate }: UserDashboardScreenProps) =>
             <View style={styles.moduleActionRow}>
               <Text style={[styles.actionBtnLabel, { color: '#6366F1' }]}>Salón</Text>
               <ChevronRight size={rem(12)} color="#6366F1" />
+            </View>
+          </TouchableOpacity>
+        </MotiView>
+
+        {/* Card 5: Courts & Bookings */}
+        <MotiView
+          from={{ opacity: 0, translateY: 10 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ type: 'spring', damping: 20, delay: 400 }}
+          style={styles.gridItem}
+        >
+          <TouchableOpacity 
+            style={[styles.moduleCard, { borderLeftColor: '#14532D', borderLeftWidth: 4 }]}
+            activeOpacity={0.8}
+            onPress={() => handleActionPress('CANCHAS')}
+          >
+            <View style={[styles.moduleIconWrapper, { backgroundColor: 'rgba(20, 83, 45, 0.06)' }]}>
+              <Goal size={rem(20)} color="#14532D" />
+            </View>
+            <Text style={styles.moduleName}>Canchas</Text>
+            <Text style={styles.moduleSub}>Agenda, tarifas, promociones e implementos del complejo.</Text>
+            <View style={styles.moduleActionRow}>
+              <Text style={[styles.actionBtnLabel, { color: '#14532D' }]}>Canchas</Text>
+              <ChevronRight size={rem(12)} color="#14532D" />
             </View>
           </TouchableOpacity>
         </MotiView>

@@ -7,6 +7,13 @@ import { NavigationContainer, createNavigationContainerRef } from '@react-naviga
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useFonts, Inter_400Regular, Inter_700Bold, Inter_900Black } from '@expo-google-fonts/inter';
 import { Jost_500Medium } from '@expo-google-fonts/jost';
+import {
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_500Medium,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold,
+  PlusJakartaSans_800ExtraBold,
+} from '@expo-google-fonts/plus-jakarta-sans';
 import { LoginScreen } from '@/features/auth/screens/LoginScreen';
 import { SyncScreen } from '@/features/pos/screens/SyncScreen';
 import { DashboardScreen } from '@/features/pos/screens/DashboardScreen';
@@ -44,6 +51,11 @@ function AppContent() {
     'Inter-Bold': Inter_700Bold,
     'Inter-Black': Inter_900Black,
     'Jost-Medium': Jost_500Medium,
+    'PlusJakartaSans-Regular': PlusJakartaSans_400Regular,
+    'PlusJakartaSans-Medium': PlusJakartaSans_500Medium,
+    'PlusJakartaSans-SemiBold': PlusJakartaSans_600SemiBold,
+    'PlusJakartaSans-Bold': PlusJakartaSans_700Bold,
+    'PlusJakartaSans-ExtraBold': PlusJakartaSans_800ExtraBold,
   });
 
   // Setup Global Logout Listener

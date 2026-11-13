@@ -126,11 +126,11 @@ export const ControlDashboardScreen = () => {
     }
   });
 
-  const categories: CategorizedSections[] = [
-    { category: 'Operaciones', sections: groups['Operaciones'] },
-    { category: 'Gestión', sections: groups['Gestión'] },
-    { category: 'Configuración', sections: groups['Configuración'] }
-  ].filter(c => c.sections.length > 0);
+  const categories: CategorizedSections[] = ([
+    { category: 'Operaciones' as DashboardCategory, sections: groups['Operaciones'] },
+    { category: 'Gestión' as DashboardCategory, sections: groups['Gestión'] },
+    { category: 'Configuración' as DashboardCategory, sections: groups['Configuración'] }
+  ]).filter(c => c.sections.length > 0);
 
   const handleNavigate = (route: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -243,7 +243,7 @@ export const ControlDashboardScreen = () => {
           ))
         ) : (
           <View style={styles.emptyState}>
-            <Search size={rem(40)} color={colors.border} />
+            <Search size={rem(40)} color={colors.slate[300]} />
             <Text style={styles.emptyText}>No se encontraron secciones para "{searchTerm}"</Text>
           </View>
         )}

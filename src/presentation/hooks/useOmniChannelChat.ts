@@ -34,11 +34,16 @@ export const useOmniChannelChat = () => {
   
   // Auth Selectors (to get active agent info)
   const authState = useAppSelector((state) => state.auth);
+  const agentRole: ChatAgent['role'] = authState.role === 'admin' || authState.role === 'owner'
+    ? 'admin'
+    : authState.role === 'waiter'
+      ? 'waiter'
+      : 'agent';
   const currentAgent: ChatAgent | null = authState.isAuthenticated 
     ? {
-        id: authState.userId || 'AGENT-101',
-        name: authState.userName || authState.email?.split('@')[0] || 'Asesor IAStock',
-        role: authState.role || 'agent',
+        id: authState.user?.id || 'AGENT-101',
+        name: authState.user?.name || authState.user?.nombre || authState.user?.email?.split('@')[0] || 'Asesor IAStock',
+        role: agentRole,
       }
     : null;
 

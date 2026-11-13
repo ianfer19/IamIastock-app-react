@@ -36,6 +36,7 @@ import {
   Building2,
   Cog,
   Home,
+  Trophy,
 } from 'lucide-react-native';
 import { MotiView } from 'moti';
 import * as Haptics from 'expo-haptics';
@@ -78,6 +79,7 @@ const NAV_ITEMS: NavItem[] = [
   { icon: ShoppingCart,    label: 'Ventas',        id: 'VENTAS',        enabled: true,  tab: 'POS'  },
   { icon: Calculator,      label: 'Caja',          id: 'CAJA',          enabled: true,  tab: 'CAJA' },
   { icon: LineChart,       label: 'Control',       id: 'CONTROL',       enabled: true,  tab: 'CONTROL' },
+  { icon: Trophy,          label: 'Canchas',       id: 'CANCHAS',       enabled: true,  tab: 'CANCHAS' },
   { icon: UtensilsCrossed, label: 'Cocina',        id: 'COCINA',        enabled: false },
   { icon: Layers,          label: 'Ecosistema',    id: 'ECOSISTEMA',    enabled: false },
   { icon: FileText,        label: 'Contabilidad',  id: 'CONTABILIDAD',  enabled: false },

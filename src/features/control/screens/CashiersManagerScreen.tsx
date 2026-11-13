@@ -134,7 +134,7 @@ export const CashiersManagerScreen = ({ onBack }: { onBack: () => void }) => {
               await CashRegisterService.deleteCashRegister(id);
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
               if (isModalVisible && selectedId === id) setIsModalVisible(false);
-              await loadData();
+              await loadCashiers();
             } catch (e) {
               console.error('Error deleting', e);
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);

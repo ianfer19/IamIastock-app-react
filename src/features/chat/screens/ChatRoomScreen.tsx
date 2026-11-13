@@ -17,7 +17,7 @@ import {
 import { MotiView, AnimatePresence } from 'moti';
 import * as Haptics from 'expo-haptics';
 import { BlurView } from 'expo-blur';
-import { Audio, Video } from 'expo-av';
+import { Audio, ResizeMode, Video } from 'expo-av';
 import { 
   ArrowLeft, 
   Send, 
@@ -91,7 +91,6 @@ const AudioBubblePlayer = ({ audioUrl, isClient, colors }: AudioBubblePlayerProp
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
         playsInSilentModeIOS: true,
-        shouldRouteThroughReceiverIOS: false,
         staysActiveInBackground: false,
       });
 
@@ -429,7 +428,7 @@ export const ChatRoomScreen = ({ chatId, onBack }: ChatRoomScreenProps) => {
                     source={{ uri: msg.attachment!.url }}
                     style={styles.mediaVideo}
                     useNativeControls
-                    resizeMode="cover"
+                    resizeMode={ResizeMode.COVER}
                     shouldPlay={false}
                   />
                 </View>

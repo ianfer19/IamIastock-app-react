@@ -23,13 +23,14 @@ import { PersonalizarScreen } from './PersonalizarScreen';
 import { InventoryDashboardScreen } from '@/features/inventory/screens/InventoryDashboardScreen';
 import { UserDashboardScreen } from './UserDashboardScreen';
 import { ControlDashboardScreen } from '@/features/control/screens/ControlDashboardScreen';
+import { CourtsModuleScreen } from '@/features/courts/screens/CourtsModuleScreen';
 import { MotiView } from 'moti';
 import { Lock, ArrowRight } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { rem } from '@/core/utils/responsive';
 import { COLORS, useTheme } from '@/core/theme/theme';
 
-export type DashboardTab = PosTab | 'CAJA' | 'PERSONALIZAR' | 'INVENTARIO' | 'CONTROL' | 'HOME';
+export type DashboardTab = PosTab | 'CAJA' | 'PERSONALIZAR' | 'INVENTARIO' | 'CONTROL' | 'CANCHAS' | 'HOME';
 
 export const DashboardScreen = (props: any) => {
   const dispatch = useAppDispatch();
@@ -228,6 +229,8 @@ export const DashboardScreen = (props: any) => {
           <ControlDashboardScreen />
         </View>
       );
+    case 'CANCHAS' as any:
+      return <CourtsModuleScreen onBack={() => changeTab('HOME')} />;
     default:
       return (
         <View style={styles.container}>
