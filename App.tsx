@@ -19,6 +19,7 @@ import { SyncScreen } from '@/features/pos/screens/SyncScreen';
 import { DashboardScreen } from '@/features/pos/screens/DashboardScreen';
 import { CheckoutScreen } from '@/features/pos/screens/CheckoutScreen';
 import { useTheme } from '@/core/theme/theme';
+import { EnvService } from '@/core/config/env';
 import { SecureStorage, SECURE_KEYS } from '@/core/storage/secureStorage';
 import { authEventEmitter } from '@/core/api/client';
 import { StatusModalProvider } from '@/core/context/StatusModalContext';
@@ -74,6 +75,7 @@ function AppContent() {
   useEffect(() => {
     const checkSession = async () => {
       try {
+        await EnvService.load();
         const token = await SecureStorage.getToken(SECURE_KEYS.ACCESS_TOKEN);
         const user = await SecureStorage.getUser();
         if (token && user) {

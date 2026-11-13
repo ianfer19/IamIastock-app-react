@@ -16,8 +16,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
-import { Mail, Lock, Eye, EyeOff, ChevronRight, Cpu, ArrowRight, Utensils } from 'lucide-react-native';
+import { Mail, Lock, Eye, EyeOff, ChevronRight, Cpu, RefreshCw } from 'lucide-react-native';
 import { COLORS } from '@/core/theme/theme';
+import { ApiStage, Env, EnvService } from '@/core/config/env';
 import { GlassCard } from '@/presentation/components/GlassCard';
 import { rem, IS_TABLET } from '@/core/utils/responsive';
 import { AuthService } from '@/infrastructure/services/authService';
@@ -40,6 +41,7 @@ export const LoginScreen = ({ onLogin }: { onLogin: (userData: any) => void }) =
   const [showPassword, setShowPassword] = useState(false);
   const [bgIndex, setBgIndex] = useState(0);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [apiStage, setApiStage] = useState<ApiStage>(EnvService.getStage());
 
   // Logic states
   const [isLoading, setIsLoading] = useState(false);
@@ -161,6 +163,19 @@ export const LoginScreen = ({ onLogin }: { onLogin: (userData: any) => void }) =
     if (errorMessage) setErrorMessage(null);
   };
 
+  const handleToggleApi = () => {
+    if (isLoading) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    const next = EnvService.toggle();
+    setApiStage(next);
+    setErrorMessage(null);
+    Alert.alert(
+      'Entorno de API cambiado',
+      `${next === 'production' ? 'Ahora usarás la API de PRODUCCIÓN.' : 'Ahora usarás la API de DESARROLLO.'}\n\n${Env.API_URL}\n\nVuelve a iniciar sesión.`,
+      [{ text: 'Entendido' }]
+    );
+  };
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -196,10 +211,28 @@ export const LoginScreen = ({ onLogin }: { onLogin: (userData: any) => void }) =
               <View style={styles.cardWrapper} pointerEvents="box-none">
                 <GlassCard style={styles.card} tint="light" intensity={100}>
                   <View style={styles.header}>
-                    <View style={styles.devBadge}>
-                      <View style={styles.dot} />
-                      <Text style={styles.badgeText}>DEV</Text>
-                    </View>
+                    <Pressable
+                      onPress={handleToggleApi}
+                      disabled={isLoading}
+                      style={({ pressed }) => [
+                        styles.devBadge,
+                        apiStage === 'production' && styles.prodBadge,
+                        pressed && styles.apiBadgePressed,
+                      ]}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Entorno de API ${apiStage === 'production' ? 'producción' : 'desarrollo'}. Toca para cambiar.`}
+                    >
+                      <View style={[styles.dot, apiStage === 'production' && styles.prodDot]} />
+                      <Text style={[styles.badgeText, apiStage === 'production' && styles.prodBadgeText]}>
+                        API {apiStage === 'production' ? 'PROD' : 'DEV'}
+                      </Text>
+                      <RefreshCw
+                        size={rem(9)}
+                        color={apiStage === 'production' ? '#059669' : COLORS.primary}
+                        style={styles.apiRefreshIcon}
+                      />
+                    </Pressable>
+                    <Text style={styles.apiSwitchHint}>Toca para cambiar la API</Text>
 
                     <View style={styles.logoContainer}>
                       <View style={styles.logoIcon}>
@@ -380,6 +413,13 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(99, 102, 241, 0.2)',
     marginBottom: rem(10),
   },
+  prodBadge: {
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    borderColor: 'rgba(16, 185, 129, 0.25)',
+  },
+  apiBadgePressed: {
+    opacity: 0.7,
+  },
   dot: {
     width: rem(5),
     height: rem(5),
@@ -387,11 +427,27 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     marginRight: rem(5),
   },
+  prodDot: {
+    backgroundColor: '#10B981',
+  },
   badgeText: {
     color: COLORS.primary,
     fontSize: rem(9),
     fontWeight: 'bold',
     fontFamily: 'Inter-Bold',
+  },
+  prodBadgeText: {
+    color: '#059669',
+  },
+  apiRefreshIcon: {
+    marginLeft: rem(5),
+  },
+  apiSwitchHint: {
+    marginTop: rem(-6),
+    marginBottom: rem(10),
+    color: COLORS.slate[400],
+    fontSize: rem(8),
+    fontFamily: 'Inter-Regular',
   },
   logoContainer: {
     flexDirection: 'row',

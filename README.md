@@ -85,10 +85,23 @@ EXPO_PUBLIC_API_URL=
 EXPO_PUBLIC_ADMIN_URL=
 EXPO_PUBLIC_ENV=
 EXPO_PUBLIC_WS_URL=
-EXPO_PUBLIC_COURTS_URL=   # opcional
+
+EXPO_PUBLIC_API_URL_DEV=
+EXPO_PUBLIC_ADMIN_URL_DEV=
+EXPO_PUBLIC_WS_URL_DEV=
+EXPO_PUBLIC_SAAS_API_URL_DEV=
+EXPO_PUBLIC_API_URL_PROD=
+EXPO_PUBLIC_ADMIN_URL_PROD=
+EXPO_PUBLIC_WS_URL_PROD=
+EXPO_PUBLIC_SAAS_API_URL_PROD=
 ```
 
-Si `EXPO_PUBLIC_COURTS_URL` no existe, el módulo de Canchas usa `EXPO_PUBLIC_API_URL`.
+La app usa dos gateways, igual que la web:
+
+- `EXPO_PUBLIC_API_URL_*`: gateway principal (auth, admin, inventario, caja, assets).
+- `EXPO_PUBLIC_SAAS_API_URL_*`: SaaSApiV2 (canchas, tarifas, promociones, reservas).
+
+El login incluye un badge **API DEV / API PROD** para alternar el entorno en runtime. La selección se guarda en `AsyncStorage` y se aplica antes de revisar la sesión.
 
 ## Estándares
 

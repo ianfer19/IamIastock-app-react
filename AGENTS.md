@@ -114,6 +114,8 @@ Archivo: `src/core/api/client.ts`
 - Inyecta `Authorization: Bearer <ID_TOKEN>`.
 - Inyecta `x-tenant-id` desde el usuario guardado.
 - En `401`: limpia storage, dispara logout global y detiene la cadena.
+  - **Excepción:** los endpoints públicos de auth (`/auth/login`, `/auth/register`, `/auth/confirm`, `/auth/forgot-password`, `/auth/reset-password`) se rechazan normalmente para que el formulario muestre el error real.
+  - Solo los 401 de endpoints protegidos deben disparar logout global.
 - En `__DEV__` loguea request/response/error.
 
 ### Variables de entorno
@@ -125,10 +127,49 @@ EXPO_PUBLIC_API_URL=
 EXPO_PUBLIC_ADMIN_URL=
 EXPO_PUBLIC_ENV=
 EXPO_PUBLIC_WS_URL=
-EXPO_PUBLIC_COURTS_URL=   # opcional
+
+# Entornos conmutables (DEV / PROD)
+EXPO_PUBLIC_API_URL_DEV=
+EXPO_PUBLIC_ADMIN_URL_DEV=
+EXPO_PUBLIC_WS_URL_DEV=
+EXPO_PUBLIC_SAAS_API_URL_DEV=
+EXPO_PUBLIC_COURTS_URL_DEV=
+
+EXPO_PUBLIC_API_URL_PROD=
+EXPO_PUBLIC_ADMIN_URL_PROD=
+EXPO_PUBLIC_WS_URL_PROD=
+EXPO_PUBLIC_SAAS_API_URL_PROD=
+EXPO_PUBLIC_COURTS_URL_PROD=
 ```
 
-`EXPO_PUBLIC_COURTS_URL` es opcional. Si no existe, el módulo de Canchas usa `Env.API_URL`.
+### Dos gateways
+
+La app usa dos API Gateways, igual que la web:
+
+| Gateway | Variable | Uso |
+|---|---|---|
+| Principal | `EXPO_PUBLIC_API_URL_*` | Auth, admin, productos, inventario, caja, pagos, assets upload |
+| SaaSApiV2 | `EXPO_PUBLIC_SAAS_API_URL_*` / `EXPO_PUBLIC_COURTS_URL_*` | Canchas, tarifas, promociones, reservas, equipos y variantes |
+
+Valores actuales (deben coincidir con `IamIAStockCloudFront/src/environments`):
+
+- DEV principal: `bq22pgfot8`
+- DEV SaaSApiV2: `z5wyhuc5x1`
+- PROD principal: `q17z7xdvu4`
+- PROD SaaSApiV2: `mz25he3b4h`
+
+`Env.API_URL` apunta al gateway principal. `Env.SAAS_API_URL` y `Env.COURTS_URL` apuntan a SaaSApiV2. La subida de imágenes (`/assets/upload-url`) vive en el gateway principal, por eso `courtUploadService` usa `Env.API_URL`.
+
+### Cambio de API DEV/PROD en runtime
+
+Archivo: `src/core/config/env.ts`
+
+- `Env` es un objeto mutable con `API_URL`, `ADMIN_URL`, `COURTS_URL`, `WS_URL`, `STAGE`, `IS_DEV`, `IS_PROD`.
+- `EnvService.load()` se ejecuta en `App.tsx` antes de revisar la sesión.
+- `EnvService.setStage()` / `toggle()` cambian el entorno de inmediato y lo persisten en `AsyncStorage` (`api_environment_v1`).
+- El login muestra un badge presionable **API DEV / API PROD** para alternar.
+- Regla: **nunca capturen `Env.API_URL` en una constante de módulo**. Lean `Env.API_URL` dentro de cada método. Esto ya se corrigió en `authService`, `tenantService`, `courtsService` y `courtUploadService`; sigan el mismo patrón en servicios nuevos.
+- `socketMiddleware` usa `Env.WS_URL` al conectar. Después de cambiar de entorno, el usuario debe iniciar sesión para que el socket se reconecte.
 
 ### Sesión
 

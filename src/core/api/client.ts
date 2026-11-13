@@ -7,6 +7,20 @@ export const authEventEmitter = {
 
 const apiClient = axios.create();
 
+const PUBLIC_AUTH_PATHS = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/confirm',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+];
+
+const isPublicAuthRequest = (url?: string): boolean => {
+  if (!url) return false;
+  const path = url.split('?')[0];
+  return PUBLIC_AUTH_PATHS.some(endpoint => path.endsWith(endpoint));
+};
+
 // Request Interceptor: Inject Token & Tenant automatically + Logging
 apiClient.interceptors.request.use(
   async (config) => {
@@ -61,7 +75,7 @@ apiClient.interceptors.response.use(
       console.log('--------------------');
     }
 
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && !isPublicAuthRequest(error.config?.url)) {
       console.log('🚨 [Auth] Session expired or invalid token. Logging out...');
       await SecureStorage.clearAll();
       authEventEmitter.onLogout();

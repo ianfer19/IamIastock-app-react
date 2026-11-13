@@ -4,8 +4,6 @@ import { SecureStorage, SECURE_KEYS } from '../../core/storage/secureStorage';
 import { Env } from '../../core/config/env';
 import { decodeJWT } from '../../core/utils/jwt';
 
-const API_BASE_URL = Env.API_URL;
-
 export interface LoginResponse {
   access_token: string;
   id_token: string;
@@ -21,10 +19,10 @@ export interface LoginResponse {
 export const AuthService = {
   login: async (username: string, password: string, signal?: AbortSignal): Promise<LoginResponse> => {
     console.log('🚀 [AuthService] Iniciando Login para:', username);
-    console.log('📡 [AuthService] URL:', `${API_BASE_URL}/auth/login`);
+    console.log('📡 [AuthService] URL:', `${Env.API_URL}/auth/login`);
 
     try {
-      const response = await apiClient.post(`${API_BASE_URL}/auth/login`, {
+      const response = await apiClient.post(`${Env.API_URL}/auth/login`, {
         username,
         password
       }, { signal });
@@ -62,18 +60,20 @@ export const AuthService = {
         
         const status = error.response.status;
         const data = error.response.data;
+        const serverMessage = data?.error || data?.message;
 
-        if (status === 401) throw new Error('Credenciales inválidas');
-        if (status === 404) throw new Error('Usuario no encontrado');
+        if (status === 401) throw new Error(serverMessage || 'Credenciales inválidas');
+        if (status === 404) throw new Error(serverMessage || 'Usuario no encontrado');
         if (status === 403) {
           if (data?.code === 'PASSWORD_RESET_REQUIRED') {
             throw { status: 403, code: 'PASSWORD_RESET_REQUIRED', message: 'Cambio de contraseña requerido' };
           }
-          throw new Error('Usuario inactivo o suspendido');
+          throw new Error(serverMessage || 'Usuario inactivo o suspendido');
         }
-      } else {
-        console.log('🌐 [AuthService] Error de Red o Servidor No Alcanzable:', error.message);
+        throw new Error(serverMessage || 'No se pudo iniciar sesión');
       }
+
+      console.log('🌐 [AuthService] Error de Red o Servidor No Alcanzable:', error.message);
       throw new Error('Error de conexión con el servidor');
     }
   },
@@ -81,7 +81,7 @@ export const AuthService = {
   getCurrentUser: async (): Promise<any> => {
     console.log('📡 [AuthService] Obteniendo perfil /admin/me');
     try {
-      const response = await apiClient.get(`${API_BASE_URL}/admin/me`);
+      const response = await apiClient.get(`${Env.API_URL}/admin/me`);
       
       // Handle Lambda wrapper if needed
       const data = response.data?.body ? JSON.parse(response.data.body) : response.data;
@@ -97,7 +97,7 @@ export const AuthService = {
   listMemberships: async (): Promise<any[]> => {
     console.log('📡 [AuthService] Listando memberships /admin/me/memberships');
     try {
-      const response = await apiClient.get(`${API_BASE_URL}/admin/me/memberships`);
+      const response = await apiClient.get(`${Env.API_URL}/admin/me/memberships`);
       
       // Handle Lambda Proxy wrapper
       const data = response.data?.body ? JSON.parse(response.data.body) : response.data;
@@ -117,7 +117,7 @@ export const AuthService = {
       console.log('[AuthService] Recuperando refresh_token de SecureStorage:', 
           refreshToken ? 'ENCONTRADO' : 'NO ENCONTRADO');
 
-      const response = await apiClient.post(`${API_BASE_URL}/admin/me/switch-context`, {
+      const response = await apiClient.post(`${Env.API_URL}/admin/me/switch-context`, {
         tenant_id: tenantId,
         refresh_token: refreshToken
       });
@@ -153,7 +153,7 @@ export const AuthService = {
 
   updateEmployee: async (employeeId: string, payload: any): Promise<any> => {
     try {
-      const response = await apiClient.put(`${API_BASE_URL}/admin/employees/${employeeId}`, payload);
+      const response = await apiClient.put(`${Env.API_URL}/admin/employees/${employeeId}`, payload);
       return response.data?.body ? JSON.parse(response.data.body) : response.data;
     } catch (error) {
       console.error('❌ [AuthService] Error en updateEmployee:', error);
@@ -163,7 +163,7 @@ export const AuthService = {
 
   changeMyPassword: async (newPassword: string): Promise<any> => {
     try {
-      const response = await apiClient.post(`${API_BASE_URL}/admin/me/password`, { new_password: newPassword });
+      const response = await apiClient.post(`${Env.API_URL}/admin/me/password`, { new_password: newPassword });
       return response.data?.body ? JSON.parse(response.data.body) : response.data;
     } catch (error) {
       console.error('❌ [AuthService] Error en changeMyPassword:', error);

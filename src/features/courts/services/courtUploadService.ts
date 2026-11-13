@@ -2,8 +2,6 @@ import * as ImagePicker from 'expo-image-picker';
 import apiClient from '@/core/api/client';
 import { Env } from '@/core/config/env';
 
-const ASSETS_URL = process.env.EXPO_PUBLIC_COURTS_URL || Env.API_URL;
-
 interface UploadUrlResponse {
     upload_url: string;
     public_url: string;
@@ -43,7 +41,7 @@ export const CourtUploadService = {
         const mimeType = asset.mimeType || (extension === 'png' ? 'image/png' : 'image/jpeg');
         const fileName = `court-${Date.now()}.${extension}`;
 
-        const response = await apiClient.post(`${ASSETS_URL}/assets/upload-url`, {
+        const response = await apiClient.post(`${Env.API_URL}/assets/upload-url`, {
             asset_type: 'other',
             file_name: fileName,
             content_type: mimeType,
